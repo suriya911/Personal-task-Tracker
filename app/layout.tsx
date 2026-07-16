@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -18,6 +18,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Task Manager",
   description: "A calm personal task manager. Nothing slips.",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Tasks" },
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover", // respect iPhone safe areas (notch/home bar)
 };
 
 export default function RootLayout({

@@ -69,24 +69,24 @@ export function CalendarView({
   return (
     <div className="w-full space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          <Button asChild variant="ghost" size="icon" className="size-8">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-1">
+          <Button asChild variant="ghost" size="icon" className="size-8 shrink-0">
             <Link href={`/calendar?m=${prevMonth}`} aria-label="Previous month">
               <ChevronLeft className="size-4" />
             </Link>
           </Button>
-          <h1 className="min-w-40 text-center text-lg font-semibold tabular-nums">
+          <h1 className="truncate text-center text-base font-semibold tabular-nums sm:min-w-40 sm:text-lg">
             {format(monthDate, "MMMM yyyy")}
           </h1>
-          <Button asChild variant="ghost" size="icon" className="size-8">
+          <Button asChild variant="ghost" size="icon" className="size-8 shrink-0">
             <Link href={`/calendar?m=${nextMonth}`} aria-label="Next month">
               <ChevronRight className="size-4" />
             </Link>
           </Button>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm tabular-nums text-muted-foreground">
+        <div className="flex shrink-0 items-center gap-3">
+          <span className="hidden text-sm tabular-nums text-muted-foreground sm:inline">
             {monthTotal} tasks · {monthDone} done
           </span>
           <Button asChild variant="outline" size="sm" disabled={isCurrentMonth}>

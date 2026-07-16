@@ -15,7 +15,7 @@ const TABS = [
 export function MobileNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 flex h-16 items-stretch border-t border-border bg-card/80 backdrop-blur-xl md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-30 flex h-16 items-stretch border-t border-border bg-card/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
       {TABS.map((t) => {
         const active = pathname === t.href;
         return (
