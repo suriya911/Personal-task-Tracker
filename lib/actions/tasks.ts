@@ -33,7 +33,8 @@ export async function createTask(input: CreateTaskInput): Promise<ActionResult> 
   const { supabase, userId } = await requireUser();
   if (!supabase || !userId) return { ok: false, error: "Not signed in" };
 
-  const { title, priority, is_important, category_id, project_id } = parsed.data;
+  const { title, priority, is_important, category_id, project_id, description } =
+    parsed.data;
   // Bare quick-add defaults to "due today"; project quick-add passes null.
   const due_date =
     parsed.data.due_date === undefined ? todayStr() : parsed.data.due_date;
@@ -51,6 +52,7 @@ export async function createTask(input: CreateTaskInput): Promise<ActionResult> 
   const { error } = await supabase.from("tasks").insert({
     user_id: userId,
     title,
+    description: description ?? null,
     priority,
     is_important,
     category_id: finalCategoryId,

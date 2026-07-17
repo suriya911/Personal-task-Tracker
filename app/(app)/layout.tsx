@@ -6,6 +6,7 @@ import { getSidebarData } from "@/lib/queries/sidebar";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { CommandMenu } from "@/components/layout/command-menu";
+import { AssistantDialog } from "@/components/ai/assistant-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Avatar,
@@ -54,6 +55,7 @@ export default async function AppLayout({
 
         {user && (
           <div className="flex items-center gap-2">
+            <AssistantDialog />
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {email}
             </span>
