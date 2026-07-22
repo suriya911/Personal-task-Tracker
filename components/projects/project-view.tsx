@@ -4,8 +4,8 @@ import { useOptimistic, useState, useTransition } from "react";
 import { addDays, format, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { TaskItem } from "@/components/tasks/task-item";
+import { TaskListCard } from "@/components/tasks/task-list-card";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import {
   createTask,
@@ -177,34 +177,42 @@ export function ProjectView({
         </span>
       </div>
 
-      <form onSubmit={handleAdd} className="relative">
-        <Plus className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
+      <form
+        onSubmit={handleAdd}
+        className="glass-panel flex items-center gap-2 rounded-full py-1.5 pr-3 pl-1.5 focus-within:ring-1 focus-within:ring-primary/40"
+      >
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+          <Plus className="size-4" />
+        </span>
+        <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Add a task to this project…"
-          className="pl-9"
+          aria-label="Add a task to this project"
+          className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
         />
       </form>
 
       {tasks.length === 0 ? (
-        <p className="rounded-xl border border-dashed py-12 text-center text-sm text-muted-foreground">
+        <p className="glass-panel rounded-2xl border-dashed py-12 text-center text-sm text-muted-foreground">
           No tasks yet. Add one above.
         </p>
       ) : (
-        <div className="space-y-0.5">
-          {tasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              showDueDate
-              onToggle={handleToggle}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-              onPostpone={handlePostpone}
-            />
-          ))}
-        </div>
+        <TaskListCard>
+          <div className="space-y-0.5">
+            {tasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                showDueDate
+                onToggle={handleToggle}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+                onPostpone={handlePostpone}
+              />
+            ))}
+          </div>
+        </TaskListCard>
       )}
 
       <TaskDialog

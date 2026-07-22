@@ -5,6 +5,7 @@ import { addDays, format, parseISO } from "date-fns";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
 import { TaskItem } from "@/components/tasks/task-item";
+import { TaskListCard } from "@/components/tasks/task-list-card";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import {
   toggleComplete,
@@ -136,7 +137,7 @@ export function ImportantView({
       </header>
 
       {tasks.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-center">
+        <div className="glass-panel flex flex-col items-center gap-3 rounded-2xl border-dashed py-16 text-center">
           <Star className="size-10 text-amber-400/50" />
           <div>
             <p className="font-medium">Nothing starred</p>
@@ -146,19 +147,21 @@ export function ImportantView({
           </div>
         </div>
       ) : (
-        <div className="space-y-0.5">
-          {tasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              showDueDate
-              onToggle={handleToggle}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-              onPostpone={handlePostpone}
-            />
-          ))}
-        </div>
+        <TaskListCard>
+          <div className="space-y-0.5">
+            {tasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                showDueDate
+                onToggle={handleToggle}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+                onPostpone={handlePostpone}
+              />
+            ))}
+          </div>
+        </TaskListCard>
       )}
 
       <TaskDialog

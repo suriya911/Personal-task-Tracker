@@ -22,7 +22,7 @@ export default async function TodayPage() {
   ]);
 
   return (
-    <main className="relative flex flex-1 flex-col items-center px-6 pb-24 pt-10 sm:pt-16">
+    <main className="relative flex flex-1 flex-col items-center px-6 pt-10 pb-36 sm:pt-16">
       {/* Aurora header glow — signature element */}
       <div
         aria-hidden

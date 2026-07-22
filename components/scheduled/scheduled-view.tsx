@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { TaskItem } from "@/components/tasks/task-item";
+import { TaskListCard } from "@/components/tasks/task-list-card";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { useTaskCollection } from "@/components/tasks/use-task-collection";
 import { formatDayHeader } from "@/lib/tasks";
@@ -36,7 +37,7 @@ export function ScheduledView({
       <h1 className="text-2xl font-semibold">Scheduled</h1>
 
       {empty ? (
-        <div className="rounded-xl border border-dashed py-16 text-center">
+        <div className="glass-panel rounded-2xl border-dashed py-16 text-center">
           <p className="font-medium">Nothing scheduled ahead</p>
           <p className="text-sm text-muted-foreground">
             Future tasks will show up here, grouped by day.
@@ -46,7 +47,7 @@ export function ScheduledView({
         <>
           {days.map((group) => (
             <section key={group.date}>
-              <div className="sticky top-14 z-10 mb-1 flex items-center gap-2 bg-background/80 py-1.5 backdrop-blur">
+              <div className="sticky top-14 z-10 mb-1 flex items-center gap-2 rounded-lg bg-background/70 px-1 py-1.5 backdrop-blur-xl">
                 <h2 className="text-sm font-medium">
                   {formatDayHeader(group.date, today)}
                 </h2>
@@ -55,18 +56,20 @@ export function ScheduledView({
                 </span>
                 <div className="ml-2 h-px flex-1 bg-border" />
               </div>
-              <div className="space-y-0.5">
-                {group.tasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={c.onToggle}
-                    onDelete={c.onDelete}
-                    onEdit={c.onEdit}
-                    onPostpone={c.onPostpone}
-                  />
-                ))}
-              </div>
+              <TaskListCard>
+                <div className="space-y-0.5">
+                  {group.tasks.map((task) => (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onToggle={c.onToggle}
+                      onDelete={c.onDelete}
+                      onEdit={c.onEdit}
+                      onPostpone={c.onPostpone}
+                    />
+                  ))}
+                </div>
+              </TaskListCard>
             </section>
           ))}
 
@@ -92,18 +95,20 @@ export function ScheduledView({
                 />
               </button>
               {noDateOpen && (
-                <div className="space-y-0.5">
-                  {noDate.map((task) => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onToggle={c.onToggle}
-                      onDelete={c.onDelete}
-                      onEdit={c.onEdit}
-                      onPostpone={c.onPostpone}
-                    />
-                  ))}
-                </div>
+                <TaskListCard>
+                  <div className="space-y-0.5">
+                    {noDate.map((task) => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onToggle={c.onToggle}
+                        onDelete={c.onDelete}
+                        onEdit={c.onEdit}
+                        onPostpone={c.onPostpone}
+                      />
+                    ))}
+                  </div>
+                </TaskListCard>
               )}
             </section>
           )}

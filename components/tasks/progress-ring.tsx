@@ -6,7 +6,7 @@ interface ProgressRingProps {
   size?: number;
 }
 
-/** Violet→fuchsia gradient ring. Animates stroke-dashoffset on change. */
+/** Violet→blue→pink gradient ring. Animates stroke-dashoffset on change. */
 export function ProgressRing({ done, total, size = 56 }: ProgressRingProps) {
   const stroke = 5;
   const r = (size - stroke) / 2;
@@ -25,7 +25,8 @@ export function ProgressRing({ done, total, size = 56 }: ProgressRingProps) {
         <defs>
           <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="hsl(263 70% 62%)" />
-            <stop offset="100%" stopColor="hsl(291 70% 62%)" />
+            <stop offset="50%" stopColor="hsl(230 80% 64%)" />
+            <stop offset="100%" stopColor="hsl(322 70% 62%)" />
           </linearGradient>
         </defs>
         <circle

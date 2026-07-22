@@ -69,7 +69,7 @@ export function Sidebar({ data }: { data: SidebarData }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col gap-4 border-r border-border bg-card/60 px-3 py-4 backdrop-blur-xl md:flex">
+    <aside className="hidden w-64 shrink-0 flex-col gap-4 border-r border-foreground/10 bg-card/40 px-3 py-4 backdrop-blur-2xl backdrop-saturate-150 md:flex">
       <nav className="space-y-0.5">
         {VIEWS.map((v) => (
           <NavLink
@@ -150,9 +150,9 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "relative flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
+        "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
         active
-          ? "bg-primary/10 font-medium text-foreground"
+          ? "bg-gradient-to-r from-primary/20 to-fuchsia-500/10 font-medium text-foreground ring-1 ring-primary/15"
           : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
       )}
     >

@@ -46,8 +46,19 @@ export default async function AppLayout({
   const sidebar = user ? await getSidebarData() : null;
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-card/60 px-4 backdrop-blur-xl sm:px-6">
+    <div className="relative flex min-h-full flex-1 flex-col">
+      {/* Ambient wallpaper glow — sits behind every glass surface (header,
+          sidebar, cards, floating pill) so the blur has color to catch. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      >
+        <div className="absolute -top-32 -left-32 size-96 rounded-full bg-violet-600/20 blur-[100px]" />
+        <div className="absolute top-1/3 -right-24 size-96 rounded-full bg-blue-500/10 blur-[110px]" />
+        <div className="absolute bottom-0 left-1/4 size-96 rounded-full bg-fuchsia-500/10 blur-[120px]" />
+      </div>
+
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-foreground/10 bg-card/40 px-4 backdrop-blur-2xl backdrop-saturate-150 sm:px-6">
         <div className="flex items-center gap-2 font-semibold">
           <CheckCircle2 className="size-5 text-primary" />
           <span>Task Manager</span>

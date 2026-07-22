@@ -6,6 +6,7 @@ import { CheckCircle2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { QuickAdd } from "@/components/tasks/quick-add";
 import { TaskItem } from "@/components/tasks/task-item";
+import { TaskListCard } from "@/components/tasks/task-list-card";
 import { ProgressRing } from "@/components/tasks/progress-ring";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import {
@@ -201,8 +202,6 @@ export function TodayView({
         {total > 0 && <ProgressRing done={done} total={total} />}
       </header>
 
-      <QuickAdd onAdd={handleAdd} />
-
       {allEmpty ? (
         <EmptyState />
       ) : (
@@ -216,26 +215,30 @@ export function TodayView({
               onToggle={() => setOverdueOpen((v) => !v)}
               accent="text-rose-400"
             >
-              <TaskRows
-                tasks={overdue}
-                showDueDate
-                onToggle={handleToggle}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                onPostpone={handlePostpone}
-              />
+              <TaskListCard>
+                <TaskRows
+                  tasks={overdue}
+                  showDueDate
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onPostpone={handlePostpone}
+                />
+              </TaskListCard>
             </Collapsible>
           )}
 
           {todaySec.length > 0 && (
             <Section title="Today" count={todaySec.length}>
-              <TaskRows
-                tasks={todaySec}
-                onToggle={handleToggle}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                onPostpone={handlePostpone}
-              />
+              <TaskListCard>
+                <TaskRows
+                  tasks={todaySec}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onPostpone={handlePostpone}
+                />
+              </TaskListCard>
             </Section>
           )}
 
@@ -247,13 +250,15 @@ export function TodayView({
               collapsible
               onToggle={() => setNoDateOpen((v) => !v)}
             >
-              <TaskRows
-                tasks={noDate}
-                onToggle={handleToggle}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                onPostpone={handlePostpone}
-              />
+              <TaskListCard>
+                <TaskRows
+                  tasks={noDate}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onPostpone={handlePostpone}
+                />
+              </TaskListCard>
             </Collapsible>
           )}
         </div>
@@ -266,6 +271,8 @@ export function TodayView({
         onOpenChange={setDialogOpen}
         onSaved={handleSaved}
       />
+
+      <QuickAdd onAdd={handleAdd} />
     </div>
   );
 }
@@ -381,7 +388,7 @@ function Collapsible({
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-center">
+    <div className="glass-panel flex flex-col items-center gap-3 rounded-2xl border-dashed py-16 text-center">
       <CheckCircle2 className="size-10 text-primary/60" />
       <div>
         <p className="font-medium">All clear</p>
