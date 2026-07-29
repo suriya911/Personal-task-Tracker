@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 /**
  * User-selectable app backgrounds. Each scene is drawn with CSS/SVG in the
@@ -13,33 +13,47 @@ export const BACKDROPS = [
   { id: "snowfall", name: "Snowfall" },
   { id: "forest", name: "Misty forest" },
   { id: "minimal", name: "Minimal" },
+  { id: "photo-village", name: "Holiday village · photo" },
+  { id: "photo-lights", name: "Holiday lights · photo" },
+  { id: "photo-cabin", name: "Winter cabin · photo" },
+  { id: "photo-night", name: "Starry night · photo" },
+  { id: "photo-mountains", name: "Snowy peaks · photo" },
 ] as const;
 
 export type BackdropId = (typeof BACKDROPS)[number]["id"];
 
+/** Real photographs (Unsplash license — free to use). */
+export const PHOTOS: Partial<Record<BackdropId, string>> = {
+  "photo-village": "/backdrops/village.jpg",
+  "photo-lights": "/backdrops/lights.jpg",
+  "photo-cabin": "/backdrops/cabin.jpg",
+  "photo-night": "/backdrops/night.jpg",
+  "photo-mountains": "/backdrops/mountains.jpg",
+};
+
 const KEY = "tm-backdrop";
 const EVENT = "tm-backdrop-change";
 
-export function useBackdrop() {
-  const [id, setId] = useState<BackdropId>("aurora");
-  const [mounted, setMounted] = useState(false);
+function subscribe(onChange: () => void) {
+  window.addEventListener(EVENT, onChange);
+  return () => window.removeEventListener(EVENT, onChange);
+}
 
-  useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem(KEY) as BackdropId | null;
-    if (saved && BACKDROPS.some((b) => b.id === saved)) setId(saved);
-    const onChange = (e: Event) =>
-      setId((e as CustomEvent<BackdropId>).detail);
-    window.addEventListener(EVENT, onChange);
-    return () => window.removeEventListener(EVENT, onChange);
-  }, []);
+function getSnapshot(): BackdropId {
+  const saved = localStorage.getItem(KEY) as BackdropId | null;
+  return saved && BACKDROPS.some((b) => b.id === saved) ? saved : "aurora";
+}
+
+export function useBackdrop() {
+  // Server render always shows the default; the stored choice hydrates in.
+  const id = useSyncExternalStore(subscribe, getSnapshot, () => "aurora" as BackdropId);
 
   const set = (v: BackdropId) => {
     localStorage.setItem(KEY, v);
     window.dispatchEvent(new CustomEvent(EVENT, { detail: v }));
   };
 
-  return { id: mounted ? id : ("aurora" as BackdropId), set };
+  return { id, set };
 }
 
 export function Backdrop() {
@@ -55,7 +69,24 @@ export function Backdrop() {
       {id === "snowfall" && <Snowfall />}
       {id === "forest" && <Forest />}
       {id === "minimal" && <Minimal />}
+      {PHOTOS[id] && <Photo src={PHOTOS[id]} />}
     </div>
+  );
+}
+
+/** A real photograph, veiled so glass panels and text stay readable in
+ *  both themes: light lifts it toward white, dark sinks it toward black. */
+function Photo({ src }: { src: string }) {
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative fixed wallpaper; next/image adds nothing here */}
+      <img
+        src={src}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-white/50 dark:bg-black/60" />
+    </>
   );
 }
 
