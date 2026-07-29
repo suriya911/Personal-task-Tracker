@@ -30,6 +30,23 @@ const SWATCH: Partial<Record<BackdropId, string>> = {
   minimal: "bg-gradient-to-b from-background to-muted",
 };
 
+function BackdropItem({ b }: { b: (typeof BACKDROPS)[number] }) {
+  return (
+    <DropdownMenuRadioItem value={b.id}>
+      <span
+        className={cn(
+          "mr-2 inline-block size-4 rounded-full border border-foreground/15 bg-cover bg-center",
+          SWATCH[b.id],
+        )}
+        style={
+          PHOTOS[b.id] ? { backgroundImage: `url(${PHOTOS[b.id]})` } : undefined
+        }
+      />
+      {b.name}
+    </DropdownMenuRadioItem>
+  );
+}
+
 export function BackdropPicker() {
   const { id, set } = useBackdrop();
   const { theme, setTheme } = useTheme();
@@ -52,27 +69,22 @@ export function BackdropPicker() {
         <TooltipContent>Background & theme</TooltipContent>
       </Tooltip>
 
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel>Background</DropdownMenuLabel>
+      <DropdownMenuContent
+        align="end"
+        className="max-h-[70vh] w-56 overflow-y-auto"
+      >
         <DropdownMenuRadioGroup
           value={id}
           onValueChange={(v) => set(v as BackdropId)}
         >
-          {BACKDROPS.map((b) => (
-            <DropdownMenuRadioItem key={b.id} value={b.id}>
-              <span
-                className={cn(
-                  "mr-2 inline-block size-4 rounded-full border border-foreground/15 bg-cover bg-center",
-                  SWATCH[b.id],
-                )}
-                style={
-                  PHOTOS[b.id]
-                    ? { backgroundImage: `url(${PHOTOS[b.id]})` }
-                    : undefined
-                }
-              />
-              {b.name}
-            </DropdownMenuRadioItem>
+          <DropdownMenuLabel>Background</DropdownMenuLabel>
+          {BACKDROPS.filter((b) => !PHOTOS[b.id]).map((b) => (
+            <BackdropItem key={b.id} b={b} />
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>Holidays around the world</DropdownMenuLabel>
+          {BACKDROPS.filter((b) => PHOTOS[b.id]).map((b) => (
+            <BackdropItem key={b.id} b={b} />
           ))}
         </DropdownMenuRadioGroup>
 

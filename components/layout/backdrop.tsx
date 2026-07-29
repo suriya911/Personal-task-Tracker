@@ -13,11 +13,17 @@ export const BACKDROPS = [
   { id: "snowfall", name: "Snowfall" },
   { id: "forest", name: "Misty forest" },
   { id: "minimal", name: "Minimal" },
-  { id: "photo-village", name: "Holiday village · photo" },
-  { id: "photo-lights", name: "Holiday lights · photo" },
-  { id: "photo-cabin", name: "Winter cabin · photo" },
-  { id: "photo-night", name: "Starry night · photo" },
-  { id: "photo-mountains", name: "Snowy peaks · photo" },
+  { id: "photo-village", name: "Christmas village" },
+  { id: "photo-lights", name: "Christmas lights" },
+  { id: "photo-cabin", name: "Winter cabin" },
+  { id: "photo-night", name: "Starry night" },
+  { id: "photo-mountains", name: "Snowy peaks" },
+  { id: "photo-newyear", name: "New Year fireworks" },
+  { id: "photo-lunar", name: "Lunar New Year" },
+  { id: "photo-holi", name: "Holi colors" },
+  { id: "photo-eid", name: "Eid / Ramadan" },
+  { id: "photo-diwali", name: "Diwali lamps" },
+  { id: "photo-halloween", name: "Halloween" },
 ] as const;
 
 export type BackdropId = (typeof BACKDROPS)[number]["id"];
@@ -29,6 +35,12 @@ export const PHOTOS: Partial<Record<BackdropId, string>> = {
   "photo-cabin": "/backdrops/cabin.jpg",
   "photo-night": "/backdrops/night.jpg",
   "photo-mountains": "/backdrops/mountains.jpg",
+  "photo-newyear": "/backdrops/newyear.jpg",
+  "photo-lunar": "/backdrops/lunar.jpg",
+  "photo-holi": "/backdrops/holi.jpg",
+  "photo-eid": "/backdrops/eid.jpg",
+  "photo-diwali": "/backdrops/diwali.jpg",
+  "photo-halloween": "/backdrops/halloween.jpg",
 };
 
 const KEY = "tm-backdrop";
