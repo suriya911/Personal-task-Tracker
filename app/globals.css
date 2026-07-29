@@ -180,9 +180,25 @@
     transform: translate3d(3rem, -2rem, 0) scale(1.08);
   }
 }
+
+/* Falling-snow backdrop layers — the tiled dots scroll downward. */
+@utility animate-snow {
+  animation: snow 14s linear infinite;
+}
+@utility animate-snow-slow {
+  animation: snow 26s linear infinite;
+}
+@keyframes snow {
+  to {
+    background-position: 40px 100vh;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-drift,
-  .animate-drift-late {
+  .animate-drift-late,
+  .animate-snow,
+  .animate-snow-slow {
     animation: none;
   }
 }

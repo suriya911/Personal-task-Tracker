@@ -5,6 +5,8 @@ import { signOut } from "@/lib/actions/auth";
 import { getSidebarData } from "@/lib/queries/sidebar";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { Backdrop } from "@/components/layout/backdrop";
+import { BackdropPicker } from "@/components/layout/backdrop-picker";
 import { CommandMenu } from "@/components/layout/command-menu";
 import { AssistantDialog } from "@/components/ai/assistant-dialog";
 import { Button } from "@/components/ui/button";
@@ -47,16 +49,9 @@ export default async function AppLayout({
 
   return (
     <div className="relative flex min-h-full flex-1 flex-col">
-      {/* Ambient wallpaper glow — sits behind every glass surface (header,
+      {/* User-selectable wallpaper — sits behind every glass surface (header,
           sidebar, cards, floating pill) so the blur has color to catch. */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-      >
-        <div className="absolute -top-32 -left-32 size-96 rounded-full bg-violet-600/30 blur-[100px]" />
-        <div className="absolute top-1/3 -right-24 size-96 rounded-full bg-blue-500/15 blur-[110px]" />
-        <div className="absolute bottom-0 left-1/4 size-96 rounded-full bg-fuchsia-500/15 blur-[120px]" />
-      </div>
+      <Backdrop />
 
       <header className="glass-chrome sticky top-0 z-30 flex h-14 items-center justify-between border-b border-foreground/10 px-4 sm:px-6">
         <div className="flex items-center gap-2 font-semibold">
@@ -66,6 +61,7 @@ export default async function AppLayout({
 
         {user && (
           <div className="flex items-center gap-2">
+            <BackdropPicker />
             <AssistantDialog />
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {email}
