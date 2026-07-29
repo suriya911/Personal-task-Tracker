@@ -8,14 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Scenery } from "@/components/layout/scenery";
 
 type Mode = "signin" | "signup";
 
@@ -95,25 +89,21 @@ export default function LoginPage() {
 
   return (
     <main className="relative flex min-h-full flex-1 items-center justify-center px-6 py-10">
-      {/* Aurora glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,hsl(263_70%_62%/0.18),transparent)]"
-      />
-      <Card className="relative w-full max-w-sm">
-        <CardHeader className="items-center text-center">
+      <Scenery />
+      <div className="glass-panel relative w-full max-w-sm rounded-3xl p-6 sm:p-8">
+        <div className="mb-6 flex flex-col items-center gap-1 text-center">
           <CheckCircle2 className="mb-1 size-8 text-primary" />
-          <CardTitle className="text-xl">
+          <h1 className="text-xl font-semibold">
             {mode === "signin" ? "Welcome back" : "Create your account"}
-          </CardTitle>
-          <CardDescription>
+          </h1>
+          <p className="text-sm text-muted-foreground">
             {mode === "signin"
               ? "Sign in to your task manager. Nothing slips."
               : "Set an email and password to get started."}
-          </CardDescription>
-        </CardHeader>
+          </p>
+        </div>
 
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           {sent ? (
             <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-6 text-center">
               <Mail className="size-6 text-primary" />
@@ -235,8 +225,8 @@ export default function LoginPage() {
               </div>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </main>
   );
 }

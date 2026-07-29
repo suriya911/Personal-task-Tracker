@@ -168,6 +168,25 @@
   }
 }
 
+/* Scenery orbs — slow ambient drift so the glass has moving light to catch. */
+@utility animate-drift {
+  animation: drift 22s ease-in-out infinite alternate;
+}
+@utility animate-drift-late {
+  animation: drift 22s ease-in-out 11s infinite alternate-reverse;
+}
+@keyframes drift {
+  to {
+    transform: translate3d(3rem, -2rem, 0) scale(1.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift,
+  .animate-drift-late {
+    animation: none;
+  }
+}
+
 /* Glassy route transitions — the old view dissolves into frost, the new view
    condenses out of it. Exit is quick; enter waits for the exit, then settles. */
 ::view-transition-old(.glass-exit) {

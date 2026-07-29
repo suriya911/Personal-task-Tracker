@@ -37,11 +37,13 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isAuthRoute = path.startsWith("/login") || path.startsWith("/auth");
+  const isPublic =
+    path.startsWith("/login") || path.startsWith("/auth") || path === "/home";
 
-  if (!user && !isAuthRoute) {
+  if (!user && !isPublic) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+    // The bare origin gets the landing page; deep links go to login.
+    redirectUrl.pathname = path === "/" ? "/home" : "/login";
     return NextResponse.redirect(redirectUrl);
   }
 
