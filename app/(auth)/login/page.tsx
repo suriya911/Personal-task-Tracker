@@ -69,7 +69,7 @@ export default function LoginPage() {
       }
 
       // Full navigation so the server reads the fresh session cookie.
-      window.location.assign("/");
+      window.location.assign("/dashboard");
     });
   }
 

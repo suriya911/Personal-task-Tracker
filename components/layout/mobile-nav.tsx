@@ -2,15 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, CalendarRange, CalendarDays, Star, BarChart3 } from "lucide-react";
+import {
+  Sun,
+  CalendarRange,
+  CalendarDays,
+  Star,
+  LayoutDashboard,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
+  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/", label: "Today", icon: Sun },
   { href: "/scheduled", label: "Scheduled", icon: CalendarRange },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/important", label: "Important", icon: Star },
-  { href: "/stats", label: "Stats", icon: BarChart3 },
 ];
 
 export function MobileNav() {

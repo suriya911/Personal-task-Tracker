@@ -5,14 +5,17 @@ import { cn } from "@/lib/utils";
 function Window({
   title,
   badge,
+  action,
   children,
 }: {
   title: string;
   badge?: string;
+  /** Optional link/button shown at the right of the title bar. */
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <section className="glass-panel overflow-hidden rounded-2xl">
+    <section className="glass-panel flex flex-col overflow-hidden rounded-2xl">
       <header className="flex items-center gap-2 border-b border-foreground/10 px-4 py-2.5">
         <span className="flex gap-1.5">
           <span className="size-2 rounded-full bg-red-400/80" />
@@ -25,8 +28,9 @@ function Window({
             {badge}
           </span>
         )}
+        {action && <span className="ml-auto">{action}</span>}
       </header>
-      <div className="p-4">{children}</div>
+      <div className="flex-1 p-4">{children}</div>
     </section>
   );
 }
@@ -44,14 +48,20 @@ export function TodayWindow({
   total,
   done,
   sample,
+  action,
 }: {
   tasks: HomeTask[];
   total: number;
   done: number;
   sample: boolean;
+  action?: React.ReactNode;
 }) {
   return (
-    <Window title="Today" badge={sample ? "Sample" : undefined}>
+    <Window
+      title="Today"
+      badge={sample ? "Sample" : undefined}
+      action={action}
+    >
       <div className="mb-3 flex items-baseline gap-2">
         <span className="text-2xl font-semibold">{done}</span>
         <span className="text-sm text-muted-foreground">
@@ -116,6 +126,7 @@ export function StatsWindow({
   streak,
   daily,
   sample,
+  action,
 }: {
   doneThisWeek: number;
   delta: number;
@@ -123,11 +134,16 @@ export function StatsWindow({
   streak: number;
   daily: number[];
   sample: boolean;
+  action?: React.ReactNode;
 }) {
   const max = Math.max(...daily, 1);
 
   return (
-    <Window title="Statistics" badge={sample ? "Sample" : undefined}>
+    <Window
+      title="Statistics"
+      badge={sample ? "Sample" : undefined}
+      action={action}
+    >
       <div className="grid grid-cols-3 gap-3">
         <Stat
           icon={<ListChecks className="size-3" />}

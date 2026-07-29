@@ -7,6 +7,7 @@ import {
   BarChart3,
   CalendarDays,
   CalendarRange,
+  LayoutDashboard,
   Star,
   Sun,
   FolderKanban,
@@ -39,6 +40,7 @@ import { createCategory } from "@/lib/actions/categories";
 import type { SidebarData } from "@/lib/queries/sidebar";
 
 const VIEWS = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, key: null },
   { href: "/", label: "Today", icon: Sun, key: "today" as const },
   {
     href: "/scheduled",
