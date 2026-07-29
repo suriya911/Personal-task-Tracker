@@ -100,6 +100,16 @@ describe("nextPostpone", () => {
     expect(second.postponed_count).toBe(2);
   });
 
+  it("moves an overdue task to tomorrow, not one day past its stale date", () => {
+    const r = nextPostpone(
+      { due_date: "2026-07-02", original_due_date: null, postponed_count: 4 },
+      today,
+    );
+    expect(r.due_date).toBe("2026-07-16"); // tomorrow, not 2026-07-03
+    expect(r.postponed_count).toBe(5);
+    expect(r.original_due_date).toBe("2026-07-02");
+  });
+
   it("defaults due date to today when the task had none", () => {
     const r = nextPostpone(
       { due_date: null, original_due_date: null, postponed_count: 0 },

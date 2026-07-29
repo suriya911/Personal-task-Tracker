@@ -92,7 +92,11 @@ export default async function AppLayout({
 
       <div className="flex flex-1">
         {sidebar && <Sidebar data={sidebar} />}
-        <div className="flex flex-1 flex-col pb-16 md:pb-0">{children}</div>
+        {/* min-w-0: without it the flex item refuses to shrink below its
+            content's min-content width and the page scrolls sideways. */}
+        <div className="flex min-w-0 flex-1 flex-col pb-16 md:pb-0">
+          {children}
+        </div>
       </div>
 
       {sidebar && <MobileNav />}

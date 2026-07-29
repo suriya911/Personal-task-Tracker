@@ -16,12 +16,17 @@ export interface PostponeSnapshot {
  * Postpone math: push due date one day, bump the count, and set
  * original_due_date exactly once (the first time). Pure — the server action
  * and the optimistic UI both derive from this so they never drift.
+ *
+ * Overdue tasks anchor to today, not to their stale due date: "postpone to
+ * tomorrow" has to land on tomorrow, otherwise a task overdue since last week
+ * just moves to another past day and stays overdue.
  */
 export function nextPostpone(
   s: PostponeSnapshot,
   today = todayStr(),
 ): PostponeSnapshot {
-  const base = s.due_date ? parseISO(s.due_date) : parseISO(today);
+  const base =
+    s.due_date && s.due_date > today ? parseISO(s.due_date) : parseISO(today);
   return {
     due_date: format(addDays(base, 1), "yyyy-MM-dd"),
     postponed_count: s.postponed_count + 1,

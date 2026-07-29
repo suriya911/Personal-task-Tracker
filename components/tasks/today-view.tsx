@@ -1,7 +1,6 @@
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
-import { addDays, format, parseISO } from "date-fns";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { QuickAdd } from "@/components/tasks/quick-add";
@@ -16,7 +15,7 @@ import {
   postponeTask,
   restorePostpone,
 } from "@/lib/actions/tasks";
-import { taskComparator } from "@/lib/tasks";
+import { taskComparator, nextPostpone } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
 import type { Task, CategoryRow } from "@/types/models";
 
@@ -158,18 +157,20 @@ export function TodayView({
   }
 
   function handlePostpone(task: Task) {
-    const base = task.due_date ? parseISO(task.due_date) : new Date();
-    const nextDue = format(addDays(base, 1), "yyyy-MM-dd");
+    // Same pure helper the server action uses, so the optimistic date matches.
+    const next = nextPostpone(
+      {
+        due_date: task.due_date,
+        original_due_date: task.original_due_date,
+        postponed_count: task.postponed_count,
+      },
+      today,
+    );
     startTransition(async () => {
       dispatch({
         type: "patch",
         id: task.id,
-        patch: {
-          due_date: nextDue,
-          postponed_count: task.postponed_count + 1,
-          original_due_date:
-            task.original_due_date ?? task.due_date ?? today,
-        },
+        patch: next,
       });
       const res = await postponeTask(task.id);
       if (!res.ok) {

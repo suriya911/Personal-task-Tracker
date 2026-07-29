@@ -9,7 +9,10 @@ import type { CreateTaskInput, UpdateTaskInput } from "@/lib/validations";
 
 function revalidateAll() {
   revalidatePath("/");
+  revalidatePath("/dashboard");
   revalidatePath("/important");
+  revalidatePath("/scheduled");
+  revalidatePath("/stats");
 }
 
 type ActionResult = { ok: true } | { ok: false; error: string };

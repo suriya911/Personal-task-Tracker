@@ -7,6 +7,11 @@ import {
   TodayWindow,
   type HomeTask,
 } from "@/components/home/home-windows";
+import {
+  PendingTasks,
+  type PendingTask,
+} from "@/components/home/pending-tasks";
+import { todayStr } from "@/lib/tasks";
 
 export const metadata = { title: "Dashboard" };
 
@@ -33,6 +38,29 @@ export default async function DashboardPage() {
   }));
   const done = today.today.filter((t) => t.status === "done").length;
 
+  // Everything still open, overdue first — the actionable queue.
+  const stamp = todayStr();
+  const pending: PendingTask[] = [
+    ...today.overdue,
+    ...today.today.filter((t) => t.status !== "done"),
+    ...today.noDate,
+  ].map((t) => ({
+    id: t.id,
+    title: t.title,
+    dueDate: t.due_date,
+    bucket: !t.due_date
+      ? ("none" as const)
+      : t.due_date < stamp
+        ? ("overdue" as const)
+        : t.due_date === stamp
+          ? ("today" as const)
+          : ("later" as const),
+    categoryName: t.category?.name ?? null,
+    categoryColor: t.category?.color ?? null,
+    postponedCount: t.postponed_count,
+    originalDueDate: t.original_due_date,
+  }));
+
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -55,8 +83,9 @@ export default async function DashboardPage() {
           </p>
         </header>
 
-        {/* Two windows: side by side from md up, stacked on phones. */}
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* Two windows: side by side from lg up (below that the sidebar
+            leaves too little room), stacked on phones and tablets. */}
+        <div className="grid gap-4 lg:grid-cols-2">
           <TodayWindow
             tasks={tasks}
             total={today.today.length}
@@ -74,6 +103,22 @@ export default async function DashboardPage() {
             action={<OpenLink href="/stats" label="All stats" />}
           />
         </div>
+
+        {/* Pending queue — check off or push to tomorrow without leaving here. */}
+        <section className="mt-6">
+          <div className="mb-2 flex items-baseline justify-between px-1">
+            <h2 className="text-sm font-medium">
+              Pending
+              {pending.length > 0 && (
+                <span className="ml-1.5 text-xs text-muted-foreground tabular-nums">
+                  {pending.length}
+                </span>
+              )}
+            </h2>
+            <OpenLink href="/" label="Open Today" />
+          </div>
+          <PendingTasks initial={pending} />
+        </section>
       </div>
     </main>
   );
