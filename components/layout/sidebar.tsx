@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
+  BarChart3,
   CalendarDays,
   CalendarRange,
   Star,
@@ -52,6 +53,7 @@ const VIEWS = [
     icon: Star,
     key: "important" as const,
   },
+  { href: "/stats", label: "Statistics", icon: BarChart3, key: null },
 ];
 
 const SWATCHES = [
@@ -69,7 +71,7 @@ export function Sidebar({ data }: { data: SidebarData }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col gap-4 border-r border-foreground/10 bg-card/40 px-3 py-4 backdrop-blur-2xl backdrop-saturate-150 md:flex">
+    <aside className="glass-chrome hidden w-64 shrink-0 flex-col gap-4 border-r border-foreground/10 px-3 py-4 md:flex">
       <nav className="space-y-0.5">
         {VIEWS.map((v) => (
           <NavLink

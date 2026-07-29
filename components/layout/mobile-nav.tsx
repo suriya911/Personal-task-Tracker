@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, CalendarRange, CalendarDays, Star } from "lucide-react";
+import { Sun, CalendarRange, CalendarDays, Star, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -10,12 +10,13 @@ const TABS = [
   { href: "/scheduled", label: "Scheduled", icon: CalendarRange },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/important", label: "Important", icon: Star },
+  { href: "/stats", label: "Stats", icon: BarChart3 },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 flex h-16 items-stretch border-t border-foreground/10 bg-card/60 pb-[env(safe-area-inset-bottom)] backdrop-blur-2xl backdrop-saturate-150 md:hidden">
+    <nav className="glass-chrome fixed inset-x-0 bottom-0 z-30 flex h-16 items-stretch border-t border-foreground/10 pb-[env(safe-area-inset-bottom)] md:hidden">
       {TABS.map((t) => {
         const active = pathname === t.href;
         return (

@@ -82,9 +82,13 @@
   --sidebar-accent-foreground: hsl(263 70% 40%);
   --sidebar-border: hsl(240 6% 90%);
   --sidebar-ring: hsl(263 70% 55%);
+  --glass-highlight: hsl(0 0% 100% / 0.9);
+  --glass-sheen: hsl(0 0% 100% / 0.55);
+  --glass-shadow: hsl(240 10% 8% / 0.1);
 }
 
-/* Dark — the default, the star. Calm control room: near-black, one violet accent. */
+/* Dark — the default, the star. Calm control room: near-black, one violet accent,
+   glossy glass surfaces. */
 .dark {
   --background: hsl(240 10% 4%);
   --foreground: hsl(240 8% 96%);
@@ -117,6 +121,9 @@
   --sidebar-accent-foreground: hsl(240 8% 96%);
   --sidebar-border: hsl(240 6% 16%);
   --sidebar-ring: hsl(263 70% 62%);
+  --glass-highlight: hsl(0 0% 100% / 0.22);
+  --glass-sheen: hsl(0 0% 100% / 0.13);
+  --glass-shadow: hsl(0 0% 0% / 0.45);
 }
 
 @layer base {
@@ -132,10 +139,64 @@
 }
 
 @layer components {
-  /* Frosted glass surface — the shared macOS-style vibrancy treatment for
-     the header, sidebar, floating quick-add, and list cards. Opacity/blur
-     let the ambient background glow show through. */
+  /* Glossy glass surface — vibrancy plus a specular finish for the floating
+     quick-add and list cards. The diagonal gradient is the light catching the
+     pane; the inset 1px line is the polished top edge. Opacity/blur let the
+     ambient background glow show through. */
   .glass-panel {
-    @apply border border-foreground/10 bg-card/50 shadow-lg shadow-black/5 backdrop-blur-2xl backdrop-saturate-150 dark:shadow-black/30;
+    @apply border border-foreground/10 bg-card/50 backdrop-blur-2xl backdrop-saturate-150;
+    background-image: linear-gradient(
+      160deg,
+      var(--glass-sheen),
+      transparent 55%
+    );
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      0 12px 32px -16px var(--glass-shadow);
+  }
+
+  /* Same finish tuned for edge-attached chrome (header, sidebar, mobile nav):
+     softer sheen, no drop shadow so bars stay flush with the page. */
+  .glass-chrome {
+    @apply bg-card/40 backdrop-blur-2xl backdrop-saturate-150;
+    background-image: linear-gradient(
+      to bottom,
+      var(--glass-sheen),
+      transparent 70%
+    );
+    box-shadow: inset 0 1px 0 var(--glass-highlight);
+  }
+}
+
+/* Glassy route transitions — the old view dissolves into frost, the new view
+   condenses out of it. Exit is quick; enter waits for the exit, then settles. */
+::view-transition-old(.glass-exit) {
+  animation: 180ms ease-in both glass-dissolve;
+}
+::view-transition-new(.glass-enter) {
+  animation: 280ms ease-out 120ms both glass-condense;
+}
+
+@keyframes glass-dissolve {
+  to {
+    opacity: 0;
+    filter: blur(10px) saturate(1.5);
+    transform: scale(0.985);
+  }
+}
+@keyframes glass-condense {
+  from {
+    opacity: 0;
+    filter: blur(10px) saturate(1.5);
+    transform: scale(1.01);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }

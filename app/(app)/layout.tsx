@@ -53,12 +53,12 @@ export default async function AppLayout({
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute -top-32 -left-32 size-96 rounded-full bg-violet-600/20 blur-[100px]" />
-        <div className="absolute top-1/3 -right-24 size-96 rounded-full bg-blue-500/10 blur-[110px]" />
-        <div className="absolute bottom-0 left-1/4 size-96 rounded-full bg-fuchsia-500/10 blur-[120px]" />
+        <div className="absolute -top-32 -left-32 size-96 rounded-full bg-violet-600/30 blur-[100px]" />
+        <div className="absolute top-1/3 -right-24 size-96 rounded-full bg-blue-500/15 blur-[110px]" />
+        <div className="absolute bottom-0 left-1/4 size-96 rounded-full bg-fuchsia-500/15 blur-[120px]" />
       </div>
 
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-foreground/10 bg-card/40 px-4 backdrop-blur-2xl backdrop-saturate-150 sm:px-6">
+      <header className="glass-chrome sticky top-0 z-30 flex h-14 items-center justify-between border-b border-foreground/10 px-4 sm:px-6">
         <div className="flex items-center gap-2 font-semibold">
           <CheckCircle2 className="size-5 text-primary" />
           <span>Task Manager</span>
