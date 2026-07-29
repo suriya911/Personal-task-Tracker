@@ -2,7 +2,6 @@
 
 import { useTheme } from "next-themes";
 import { Images, Moon, Sun, MonitorSmartphone } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,34 +17,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { BACKDROPS, PHOTOS, useBackdrop, type BackdropId } from "./backdrop";
-
-/** Tiny gradient swatch that hints at each drawn scene; photo scenes use a
- *  thumbnail of the actual image instead. */
-const SWATCH: Partial<Record<BackdropId, string>> = {
-  aurora: "bg-gradient-to-br from-violet-500 via-fuchsia-400 to-blue-500",
-  "winter-night": "bg-gradient-to-b from-indigo-900 via-indigo-700 to-slate-200",
-  snowfall: "bg-gradient-to-b from-slate-300 to-blue-200",
-  forest: "bg-gradient-to-b from-teal-400 to-emerald-800",
-  minimal: "bg-gradient-to-b from-background to-muted",
-};
-
-function BackdropItem({ b }: { b: (typeof BACKDROPS)[number] }) {
-  return (
-    <DropdownMenuRadioItem value={b.id}>
-      <span
-        className={cn(
-          "mr-2 inline-block size-4 rounded-full border border-foreground/15 bg-cover bg-center",
-          SWATCH[b.id],
-        )}
-        style={
-          PHOTOS[b.id] ? { backgroundImage: `url(${PHOTOS[b.id]})` } : undefined
-        }
-      />
-      {b.name}
-    </DropdownMenuRadioItem>
-  );
-}
+import {
+  BACKDROPS,
+  photoUrl,
+  useBackdrop,
+  type BackdropId,
+} from "./backdrop";
 
 export function BackdropPicker() {
   const { id, set } = useBackdrop();
@@ -60,40 +37,46 @@ export function BackdropPicker() {
               variant="ghost"
               size="icon"
               className="size-8 text-muted-foreground"
-              aria-label="Background & theme"
+              aria-label="Holiday theme"
             >
               <Images className="size-4" />
             </Button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
-        <TooltipContent>Background & theme</TooltipContent>
+        <TooltipContent>Holiday theme</TooltipContent>
       </Tooltip>
 
       <DropdownMenuContent
         align="end"
-        className="max-h-[70vh] w-56 overflow-y-auto"
+        className="max-h-[75vh] w-64 overflow-y-auto"
       >
         <DropdownMenuRadioGroup
           value={id}
           onValueChange={(v) => set(v as BackdropId)}
         >
-          <DropdownMenuLabel>Background</DropdownMenuLabel>
-          {BACKDROPS.filter((b) => !PHOTOS[b.id]).map((b) => (
-            <BackdropItem key={b.id} b={b} />
-          ))}
-          <DropdownMenuSeparator />
           <DropdownMenuLabel>Holidays around the world</DropdownMenuLabel>
-          {BACKDROPS.filter((b) => PHOTOS[b.id]).map((b) => (
-            <BackdropItem key={b.id} b={b} />
+          {BACKDROPS.map((b) => (
+            <DropdownMenuRadioItem key={b.id} value={b.id} className="gap-2">
+              <span
+                className="size-6 shrink-0 rounded-md border border-foreground/15 bg-cover bg-center"
+                style={{ backgroundImage: `url(${photoUrl(b.id)})` }}
+              />
+              <span className="min-w-0">
+                <span className="block truncate">{b.name}</span>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {b.when}
+                </span>
+              </span>
+            </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
 
         <DropdownMenuSeparator />
-        <DropdownMenuLabel>Theme</DropdownMenuLabel>
         <DropdownMenuRadioGroup
           value={theme ?? "dark"}
           onValueChange={setTheme}
         >
+          <DropdownMenuLabel>Appearance</DropdownMenuLabel>
           <DropdownMenuRadioItem value="light">
             <Sun className="mr-2 size-4" /> Light
           </DropdownMenuRadioItem>

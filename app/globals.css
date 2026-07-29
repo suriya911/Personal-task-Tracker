@@ -168,6 +168,64 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Holiday accents — the selected backdrop retints the whole UI.        */
+/* `html[data-accent]` beats the base :root / .dark rules on            */
+/* specificity, so only the accent slots change; surfaces stay put.     */
+/* Every step below is validated for chroma and ≥3:1 contrast against   */
+/* its own surface (see components/layout/backdrop.tsx).                */
+/* Deliberately unlayered: the base :root/.dark blocks are unlayered    */
+/* too, and layered rules always lose to unlayered ones.                */
+/* ------------------------------------------------------------------ */
+:root[data-accent="village"] { --accent-hue: #dc2626; }
+.dark[data-accent="village"] { --accent-hue: #ef4444; }
+:root[data-accent="lights"] { --accent-hue: #15803d; }
+.dark[data-accent="lights"] { --accent-hue: #16a34a; }
+:root[data-accent="cabin"] { --accent-hue: #b45309; }
+.dark[data-accent="cabin"] { --accent-hue: #d97706; }
+:root[data-accent="night"] { --accent-hue: #4f46e5; }
+.dark[data-accent="night"] { --accent-hue: #6366f1; }
+:root[data-accent="mountains"] { --accent-hue: #0369a1; }
+.dark[data-accent="mountains"] { --accent-hue: #0284c7; }
+:root[data-accent="newyear"] { --accent-hue: #a16207; }
+.dark[data-accent="newyear"] { --accent-hue: #b8860b; }
+:root[data-accent="lunar"] { --accent-hue: #be123c; }
+.dark[data-accent="lunar"] { --accent-hue: #e11d48; }
+:root[data-accent="carnival"] { --accent-hue: #059669; }
+.dark[data-accent="carnival"] { --accent-hue: #059669; }
+:root[data-accent="stpatricks"] { --accent-hue: #047857; }
+.dark[data-accent="stpatricks"] { --accent-hue: #047857; }
+:root[data-accent="holi"] { --accent-hue: #c026d3; }
+.dark[data-accent="holi"] { --accent-hue: #d946ef; }
+:root[data-accent="easter"] { --accent-hue: #9333ea; }
+.dark[data-accent="easter"] { --accent-hue: #a855f7; }
+:root[data-accent="eid"] { --accent-hue: #0d9488; }
+.dark[data-accent="eid"] { --accent-hue: #0d9488; }
+:root[data-accent="vesak"] { --accent-hue: #854d0e; }
+.dark[data-accent="vesak"] { --accent-hue: #a16207; }
+:root[data-accent="oktoberfest"] { --accent-hue: #1d4ed8; }
+.dark[data-accent="oktoberfest"] { --accent-hue: #2563eb; }
+:root[data-accent="midautumn"] { --accent-hue: #b45309; }
+.dark[data-accent="midautumn"] { --accent-hue: #d97706; }
+:root[data-accent="diwali"] { --accent-hue: #c2410c; }
+.dark[data-accent="diwali"] { --accent-hue: #ea580c; }
+:root[data-accent="halloween"] { --accent-hue: #9333ea; }
+.dark[data-accent="halloween"] { --accent-hue: #a855f7; }
+:root[data-accent="muertos"] { --accent-hue: #be185d; }
+.dark[data-accent="muertos"] { --accent-hue: #db2777; }
+:root[data-accent="thanksgiving"] { --accent-hue: #9a3412; }
+.dark[data-accent="thanksgiving"] { --accent-hue: #c2410c; }
+
+/* One hue drives every accent slot. Same specificity as the per-holiday
+   rules above but declared later, so it reads whichever hue they set. */
+:root[data-accent] {
+  --primary: var(--accent-hue);
+  --ring: var(--accent-hue);
+  --sidebar-primary: var(--accent-hue);
+  --sidebar-ring: var(--accent-hue);
+  --chart-1: var(--accent-hue);
+}
+
 /* Scenery orbs — slow ambient drift so the glass has moving light to catch. */
 @utility animate-drift {
   animation: drift 22s ease-in-out infinite alternate;
@@ -181,24 +239,9 @@
   }
 }
 
-/* Falling-snow backdrop layers — the tiled dots scroll downward. */
-@utility animate-snow {
-  animation: snow 14s linear infinite;
-}
-@utility animate-snow-slow {
-  animation: snow 26s linear infinite;
-}
-@keyframes snow {
-  to {
-    background-position: 40px 100vh;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .animate-drift,
-  .animate-drift-late,
-  .animate-snow,
-  .animate-snow-slow {
+  .animate-drift-late {
     animation: none;
   }
 }
