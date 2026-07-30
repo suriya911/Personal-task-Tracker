@@ -149,7 +149,7 @@ export function PendingTasks({ initial }: { initial: PendingTask[] }) {
                 type="button"
                 onClick={() => markDone(t)}
                 aria-label={`Mark "${t.title}" done`}
-                className="text-muted-foreground/60 transition-colors hover:text-primary"
+                className="touch-target shrink-0 text-muted-foreground/60 transition-colors hover:text-primary"
               >
                 <Circle className="size-5 group-hover:hidden" />
                 <CheckCircle2 className="hidden size-5 group-hover:block" />
@@ -160,20 +160,22 @@ export function PendingTasks({ initial }: { initial: PendingTask[] }) {
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm">{t.title}</p>
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs">
+            {/* One line, never wrapping mid-phrase: each chip is atomic and
+                the overflow is clipped rather than broken across lines. */}
+            <p className="mt-0.5 flex items-center gap-1.5 overflow-hidden text-xs whitespace-nowrap">
               {t.categoryName && (
-                <span className="flex items-center gap-1 text-muted-foreground">
+                <span className="flex min-w-0 items-center gap-1 text-muted-foreground">
                   <span
-                    className="size-1.5 rounded-full"
+                    className="size-1.5 shrink-0 rounded-full"
                     style={{
                       backgroundColor:
                         t.categoryColor ?? "var(--muted-foreground)",
                     }}
                   />
-                  {t.categoryName}
+                  <span className="truncate">{t.categoryName}</span>
                 </span>
               )}
-              <span className={cn(CHIP[t.bucket])}>
+              <span className={cn("shrink-0", CHIP[t.bucket])}>
                 {t.bucket === "overdue"
                   ? `Overdue${t.dueDate ? ` · ${format(parseISO(t.dueDate), "MMM d")}` : ""}`
                   : t.bucket === "today"
@@ -183,7 +185,7 @@ export function PendingTasks({ initial }: { initial: PendingTask[] }) {
                       : "No due date"}
               </span>
               {t.postponedCount > 0 && (
-                <span className="text-muted-foreground/70">
+                <span className="hidden shrink-0 text-muted-foreground/70 sm:inline">
                   · postponed {t.postponedCount}×
                 </span>
               )}
@@ -198,7 +200,7 @@ export function PendingTasks({ initial }: { initial: PendingTask[] }) {
                 size="icon"
                 onClick={() => postpone(t)}
                 aria-label={`Postpone "${t.title}" to tomorrow`}
-                className="size-8 shrink-0 text-muted-foreground"
+                className="touch-target size-8 shrink-0 text-muted-foreground"
               >
                 <CalendarClock className="size-4" />
               </Button>

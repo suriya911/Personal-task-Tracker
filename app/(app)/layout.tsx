@@ -77,7 +77,7 @@ export default async function AppLayout({
                     type="submit"
                     variant="ghost"
                     size="icon"
-                    className="size-8 text-muted-foreground"
+                    className="touch-target size-8 text-muted-foreground"
                     aria-label="Sign out"
                   >
                     <LogOut className="size-4" />

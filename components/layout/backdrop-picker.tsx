@@ -36,7 +36,7 @@ export function BackdropPicker() {
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 text-muted-foreground"
+              className="touch-target size-8 text-muted-foreground"
               aria-label="Holiday theme"
             >
               <Images className="size-4" />

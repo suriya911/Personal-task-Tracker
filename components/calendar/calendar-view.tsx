@@ -71,7 +71,7 @@ export function CalendarView({
       {/* Header */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1">
-          <Button asChild variant="ghost" size="icon" className="size-8 shrink-0">
+          <Button asChild variant="ghost" size="icon" className="touch-target size-8 shrink-0">
             <Link href={`/calendar?m=${prevMonth}`} aria-label="Previous month">
               <ChevronLeft className="size-4" />
             </Link>
@@ -79,7 +79,7 @@ export function CalendarView({
           <h1 className="truncate text-center text-base font-semibold tabular-nums sm:min-w-40 sm:text-lg">
             {format(monthDate, "MMMM yyyy")}
           </h1>
-          <Button asChild variant="ghost" size="icon" className="size-8 shrink-0">
+          <Button asChild variant="ghost" size="icon" className="touch-target size-8 shrink-0">
             <Link href={`/calendar?m=${nextMonth}`} aria-label="Next month">
               <ChevronRight className="size-4" />
             </Link>

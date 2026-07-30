@@ -102,7 +102,7 @@ export function AssistantDialog() {
         <Button
           variant="ghost"
           size="icon"
-          className="size-8 text-primary"
+          className="touch-target size-8 text-primary"
           aria-label="AI assistant"
         >
           <Sparkles className="size-4" />

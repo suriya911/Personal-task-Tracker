@@ -16,7 +16,7 @@ export function PostponeButton({ onPostpone }: { onPostpone: () => void }) {
           size="icon"
           variant="ghost"
           onClick={onPostpone}
-          className="size-8 text-muted-foreground"
+          className="touch-target size-8 text-muted-foreground"
           aria-label="Postpone to tomorrow"
         >
           <CalendarClock className="size-4" />

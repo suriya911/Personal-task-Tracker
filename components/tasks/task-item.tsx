@@ -48,7 +48,7 @@ export function TaskItem({
       <Checkbox
         checked={done}
         onCheckedChange={(v) => onToggle(task, v === true)}
-        className="size-5 transition-transform data-[state=checked]:scale-110 motion-reduce:transition-none"
+        className="touch-target size-5 shrink-0 transition-transform data-[state=checked]:scale-110 motion-reduce:transition-none"
         aria-label={done ? "Mark not done" : "Mark done"}
       />
 
@@ -104,7 +104,7 @@ export function TaskItem({
           size="icon"
           variant="ghost"
           onClick={() => onDelete(task)}
-          className="size-8 text-muted-foreground"
+          className="touch-target size-8 text-muted-foreground"
           aria-label="Delete task"
         >
           <Trash2 className="size-4" />

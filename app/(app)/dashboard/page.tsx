@@ -19,7 +19,7 @@ function OpenLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+      className="touch-target flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
     >
       {label}
       <ArrowRight className="size-3" />
