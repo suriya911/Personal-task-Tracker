@@ -11,8 +11,12 @@ export function Scenery() {
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative fixed wallpaper */}
       <img
-        src="/backdrops/village.jpg"
+        src="/backdrops/village-1920.webp"
+        srcSet="/backdrops/village-960.webp 960w, /backdrops/village-1920.webp 1920w"
+        sizes="70vw"
         alt=""
+        fetchPriority="high"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-white/55 dark:bg-black/65" />

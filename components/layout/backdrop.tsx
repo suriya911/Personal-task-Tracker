@@ -34,7 +34,12 @@ export type BackdropId = (typeof BACKDROPS)[number]["id"];
 
 export const DEFAULT_BACKDROP: BackdropId = "village";
 
-export const photoUrl = (id: BackdropId) => `/backdrops/${id}.jpg`;
+/** Small variant — also the swatch/thumbnail source. */
+export const photoUrl = (id: BackdropId) => `/backdrops/${id}-960.webp`;
+
+/** Phones pull the 960w file (~15–130 KB); larger screens the 1920w one. */
+export const photoSrcSet = (id: BackdropId) =>
+  `/backdrops/${id}-960.webp 960w, /backdrops/${id}-1920.webp 1920w`;
 
 const KEY = "tm-backdrop";
 const EVENT = "tm-backdrop-change";
@@ -81,9 +86,16 @@ export function Backdrop() {
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative fixed wallpaper; next/image adds nothing for a single full-bleed background */}
+      {/* sizes is deliberately below 100vw: the photo sits under a 55–65%
+          veil, so half-density is indistinguishable. It keeps DPR-3 phones on
+          the 960w file (~15–130 KB) while desktops still pull 1920w. */}
       <img
-        src={photoUrl(id)}
+        src={`/backdrops/${id}-1920.webp`}
+        srcSet={photoSrcSet(id)}
+        sizes="70vw"
         alt=""
+        fetchPriority="high"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
       {/* Veil keeps glass panels and text readable over any photo, in either theme. */}
