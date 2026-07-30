@@ -12,6 +12,7 @@ import {
   type PendingTask,
 } from "@/components/home/pending-tasks";
 import { todayStr } from "@/lib/tasks";
+import { hourIn } from "@/lib/timezone";
 
 export const metadata = { title: "Dashboard" };
 
@@ -61,7 +62,8 @@ export default async function DashboardPage() {
     originalDueDate: t.original_due_date,
   }));
 
-  const hour = new Date().getHours();
+  // Zone-aware: this renders on the server, where the clock is UTC.
+  const hour = hourIn();
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 

@@ -3,10 +3,13 @@ import { getTodayData } from "@/lib/queries/tasks";
 import { getCategories } from "@/lib/queries/categories";
 import { materializeRecurring } from "@/lib/recurrence-server";
 import { todayStr } from "@/lib/tasks";
+import { hourIn } from "@/lib/timezone";
 import { TodayView } from "@/components/tasks/today-view";
 
 function greetingFor(date = new Date()): string {
-  const h = date.getHours();
+  // Server-rendered, so read the hour in the app's zone — a UTC hour would
+  // wish you "Good morning" at 6pm Pacific.
+  const h = hourIn(date);
   if (h < 12) return "Good morning";
   if (h < 18) return "Good afternoon";
   return "Good evening";

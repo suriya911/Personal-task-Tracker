@@ -1,9 +1,13 @@
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
+import { APP_TIME_ZONE, dayIn } from "@/lib/timezone";
 import type { Task, TaskPriority } from "@/types/models";
 
-/** Local calendar day as `yyyy-MM-dd`. Server + client agree on the user's TZ. */
-export function todayStr(): string {
-  return format(new Date(), "yyyy-MM-dd");
+/**
+ * Today as `yyyy-MM-dd` in the app's timezone — the same answer on the server
+ * (UTC on Vercel) and in the browser (the visitor's own zone). See lib/timezone.
+ */
+export function todayStr(timeZone: string = APP_TIME_ZONE): string {
+  return dayIn(new Date(), timeZone);
 }
 
 export interface PostponeSnapshot {

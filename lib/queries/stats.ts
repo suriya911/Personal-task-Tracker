@@ -1,6 +1,7 @@
-import { format, subDays } from "date-fns";
+import { format, parseISO, subDays } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { todayStr } from "@/lib/tasks";
+import { dayIn } from "@/lib/timezone";
 
 export interface DayPoint {
   /** yyyy-MM-dd */
@@ -90,15 +91,20 @@ export async function getStats(): Promise<StatsData> {
     category: { name: string; color: string | null } | null;
   };
   const open = (openRes.data as OpenRow[] | null) ?? [];
+  // completed_at is a timestamptz; which calendar day it counts for depends on
+  // the zone, so resolve it in the app's zone rather than the runtime's.
   const doneDates = ((doneRes.data as { completed_at: string | null }[] | null) ?? [])
     .filter((r) => r.completed_at)
-    .map((r) => format(new Date(r.completed_at!), "yyyy-MM-dd"));
+    .map((r) => dayIn(new Date(r.completed_at!)));
 
   const doneByDay = new Map<string, number>();
   for (const d of doneDates) doneByDay.set(d, (doneByDay.get(d) ?? 0) + 1);
 
+  // Pure calendar arithmetic from today's date-string — no instants involved,
+  // so this can't drift with the runtime zone.
+  const todayDate = parseISO(today);
   const dayKey = (daysAgo: number) =>
-    format(subDays(new Date(), daysAgo), "yyyy-MM-dd");
+    format(subDays(todayDate, daysAgo), "yyyy-MM-dd");
   const countBack = (from: number, to: number) => {
     let n = 0;
     for (let i = from; i < to; i++) n += doneByDay.get(dayKey(i)) ?? 0;
@@ -124,8 +130,9 @@ export async function getStats(): Promise<StatsData> {
     done: 0,
   }));
   for (const d of doneDates) {
-    // date-fns getDay: 0 = Sunday; remap to Mon-first.
-    const idx = (new Date(`${d}T12:00:00`).getDay() + 6) % 7;
+    // Read the weekday off a UTC-noon instant so the result is the same in
+    // every runtime zone. getUTCDay: 0 = Sunday; remap to Mon-first.
+    const idx = (new Date(`${d}T12:00:00Z`).getUTCDay() + 6) % 7;
     byWeekday[idx].done += 1;
   }
 
