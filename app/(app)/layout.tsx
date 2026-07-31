@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { CheckCircle2, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
+import { Logo } from "@/components/layout/logo";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
 import { getSidebarData } from "@/lib/queries/sidebar";
@@ -54,10 +55,7 @@ export default async function AppLayout({
       <Backdrop />
 
       <header className="glass-chrome sticky top-0 z-30 flex h-14 items-center justify-between border-b border-foreground/10 px-4 sm:px-6">
-        <div className="flex items-center gap-2 font-semibold">
-          <CheckCircle2 className="size-5 text-primary" />
-          <span>Task Manager</span>
-        </div>
+        <Logo href="/dashboard" />
 
         {user && (
           <div className="flex items-center gap-2">

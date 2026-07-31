@@ -1,6 +1,7 @@
 import { Database, PlugZap } from "lucide-react";
 import { getTodayData } from "@/lib/queries/tasks";
 import { getCategories } from "@/lib/queries/categories";
+import { getSidebarData } from "@/lib/queries/sidebar";
 import { materializeRecurring } from "@/lib/recurrence-server";
 import { todayStr } from "@/lib/tasks";
 import { hourIn } from "@/lib/timezone";
@@ -19,9 +20,10 @@ export default async function TodayPage() {
   // Lazily generate any due recurring instances before reading Today.
   await materializeRecurring(todayStr());
 
-  const [data, categories] = await Promise.all([
+  const [data, categories, sidebar] = await Promise.all([
     getTodayData(),
     getCategories(),
+    getSidebarData(),
   ]);
 
   return (
@@ -37,6 +39,7 @@ export default async function TodayPage() {
           greeting={greetingFor()}
           today={todayStr()}
           categories={categories}
+          projects={sidebar.projects.map((p) => ({ id: p.id, name: p.name }))}
           initial={data}
         />
       ) : (

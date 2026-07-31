@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/layout/logo";
 import { Scenery } from "@/components/layout/scenery";
 import {
   StatsWindow,
@@ -44,10 +44,7 @@ export default async function HomePage() {
       <Scenery />
 
       <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-5">
-        <div className="flex items-center gap-2 font-semibold">
-          <CheckCircle2 className="size-5 text-primary" />
-          Task Manager
-        </div>
+        <Logo href="/home" />
         <nav className="flex items-center gap-1 sm:gap-2">
           <Button asChild variant="ghost" className="text-muted-foreground">
             <Link href="/login">Sign in</Link>

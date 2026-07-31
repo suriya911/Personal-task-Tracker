@@ -17,6 +17,10 @@ function revalidateAll() {
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
+/** createTask also hands back the new row's id, so callers can attach a
+ *  recurrence rule to it without a follow-up lookup. */
+type CreateResult = { ok: true; id: string } | { ok: false; error: string };
+
 async function requireUser() {
   const supabase = await createClient();
   if (!supabase) return { supabase: null, userId: null };
@@ -27,7 +31,7 @@ async function requireUser() {
 }
 
 /** Quick-add / dialog create. Defaults a bare quick-add to "due today". */
-export async function createTask(input: CreateTaskInput): Promise<ActionResult> {
+export async function createTask(input: CreateTaskInput): Promise<CreateResult> {
   const parsed = createTaskSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid task" };
@@ -52,20 +56,25 @@ export async function createTask(input: CreateTaskInput): Promise<ActionResult> 
     finalCategoryId = categorizeTask(title, cats ?? []);
   }
 
-  const { error } = await supabase.from("tasks").insert({
-    user_id: userId,
-    title,
-    description: description ?? null,
-    priority,
-    is_important,
-    category_id: finalCategoryId,
-    project_id: project_id ?? null,
-    due_date,
-  });
+  const { data, error } = await supabase
+    .from("tasks")
+    .insert({
+      user_id: userId,
+      title,
+      description: description ?? null,
+      priority,
+      is_important,
+      category_id: finalCategoryId,
+      project_id: project_id ?? null,
+      due_date,
+      due_time: parsed.data.due_time ?? null,
+    })
+    .select("id")
+    .single();
 
   if (error) return { ok: false, error: error.message };
   revalidateAll();
-  return { ok: true };
+  return { ok: true, id: data.id };
 }
 
 export async function toggleComplete(

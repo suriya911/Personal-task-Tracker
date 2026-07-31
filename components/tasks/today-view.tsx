@@ -9,6 +9,10 @@ import { TaskListCard } from "@/components/tasks/task-list-card";
 import { ProgressRing } from "@/components/tasks/progress-ring";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import {
+  AddTaskDialog,
+  type ProjectOption,
+} from "@/components/tasks/add-task-dialog";
+import {
   createTask,
   toggleComplete,
   deleteTask,
@@ -23,6 +27,7 @@ interface TodayViewProps {
   greeting: string;
   today: string; // yyyy-MM-dd
   categories: CategoryRow[];
+  projects?: ProjectOption[];
   initial: { overdue: Task[]; today: Task[]; noDate: Task[] };
 }
 
@@ -65,6 +70,7 @@ export function TodayView({
   greeting,
   today,
   categories,
+  projects = [],
   initial,
 }: TodayViewProps) {
   const flat = [...initial.overdue, ...initial.today, ...initial.noDate];
@@ -200,7 +206,10 @@ export function TodayView({
               : `${done} of ${total} done today.`}
           </p>
         </div>
-        {total > 0 && <ProgressRing done={done} total={total} />}
+        <div className="flex shrink-0 items-center gap-3">
+          <AddTaskDialog categories={categories} projects={projects} />
+          {total > 0 && <ProgressRing done={done} total={total} />}
+        </div>
       </header>
 
       {allEmpty ? (

@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/", label: "Today", icon: Sun },
   { href: "/scheduled", label: "Scheduled", icon: CalendarRange },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },

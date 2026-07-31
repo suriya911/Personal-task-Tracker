@@ -85,10 +85,10 @@ export function Backdrop() {
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- decorative fixed wallpaper; next/image adds nothing for a single full-bleed background */}
       {/* sizes is deliberately below 100vw: the photo sits under a 55–65%
           veil, so half-density is indistinguishable. It keeps DPR-3 phones on
           the 960w file (~15–130 KB) while desktops still pull 1920w. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative fixed wallpaper; next/image adds nothing for a single full-bleed background */}
       <img
         src={`/backdrops/${id}-1920.webp`}
         srcSet={photoSrcSet(id)}

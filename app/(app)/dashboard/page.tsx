@@ -11,6 +11,10 @@ import {
   PendingTasks,
   type PendingTask,
 } from "@/components/home/pending-tasks";
+import { AddTaskDialog } from "@/components/tasks/add-task-dialog";
+import { getCategories } from "@/lib/queries/categories";
+import { getSidebarData } from "@/lib/queries/sidebar";
+import { materializeRecurring } from "@/lib/recurrence-server";
 import { todayStr } from "@/lib/tasks";
 import { hourIn } from "@/lib/timezone";
 
@@ -29,7 +33,15 @@ function OpenLink({ href, label }: { href: string; label: string }) {
 }
 
 export default async function DashboardPage() {
-  const [today, stats] = await Promise.all([getTodayData(), getStats()]);
+  // Same lazy upkeep as Today, so the dashboard is never a stale view.
+  await materializeRecurring(todayStr());
+
+  const [today, stats, categories, sidebar] = await Promise.all([
+    getTodayData(),
+    getStats(),
+    getCategories(),
+    getSidebarData(),
+  ]);
 
   const tasks: HomeTask[] = today.today.slice(0, 6).map((t) => ({
     id: t.id,
@@ -70,19 +82,26 @@ export default async function DashboardPage() {
   return (
     <main className="flex flex-1 flex-col items-center px-4 pt-8 pb-24 sm:px-6 sm:pt-12">
       <div className="w-full max-w-4xl">
-        <header className="mb-6">
-          <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
-            {greeting}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {today.today.length === 0
-              ? "Nothing due today."
-              : `${done} of ${today.today.length} done today${
-                  today.overdue.length > 0
-                    ? ` · ${today.overdue.length} overdue`
-                    : ""
-                }.`}
-          </p>
+        <header className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-heading text-2xl font-semibold sm:text-3xl">
+              {greeting}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {today.today.length === 0
+                ? "Nothing due today."
+                : `${done} of ${today.today.length} done today${
+                    today.overdue.length > 0
+                      ? ` · ${today.overdue.length} overdue`
+                      : ""
+                  }.`}
+            </p>
+          </div>
+          <AddTaskDialog
+            categories={categories}
+            projects={sidebar.projects.map((p) => ({ id: p.id, name: p.name }))}
+            className="shrink-0"
+          />
         </header>
 
         {/* Two windows: side by side from lg up (below that the sidebar

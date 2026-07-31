@@ -18,6 +18,29 @@ function instanceId(ruleId: string, date: string): string {
 }
 
 /**
+ * A repeating task belongs to its own day. Once that day has passed, an
+ * *unfinished* instance is swept away rather than nagging forever in Overdue —
+ * tomorrow brings a fresh one. Finished instances are deliberately kept: they
+ * carry `completed_at`, which is what the streak and statistics are counted
+ * from, and they are invisible in every view anyway (Today filters by
+ * `due_date = today`, Overdue by `status = todo`).
+ */
+async function purgeStaleRecurringInstances(
+  supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>,
+  today: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("tasks")
+    .delete()
+    .eq("is_recurrence_template", false)
+    .not("recurrence_id", "is", null)
+    .eq("status", "todo")
+    .lt("due_date", today);
+
+  if (error) console.error("purgeStaleRecurringInstances:", error.message);
+}
+
+/**
  * Lazily materialize recurring tasks on read. For each template, ensure the
  * most recent occurrence on/before `today` exists as a concrete instance.
  * Idempotent — safe to call on every Today load. No backlog: miss a week, you
@@ -30,6 +53,8 @@ export async function materializeRecurring(today: string): Promise<void> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return;
+
+  await purgeStaleRecurringInstances(supabase, today);
 
   const { data: templates } = await supabase
     .from("tasks")

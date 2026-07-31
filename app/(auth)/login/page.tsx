@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckCircle2, Mail, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Scenery } from "@/components/layout/scenery";
+import { Logo, LogoMark } from "@/components/layout/logo";
 
 type Mode = "signin" | "signup";
 
@@ -90,9 +92,21 @@ export default function LoginPage() {
   return (
     <main className="relative flex min-h-full flex-1 items-center justify-center px-6 py-10">
       <Scenery />
+
+      {/* Always-on-top brand bar — also the way back to the landing page. */}
+      <header className="fixed inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-5">
+        <Logo href="/home" />
+        <Button asChild variant="ghost" className="text-muted-foreground">
+          <Link href="/home">
+            <ArrowLeft className="size-4" />
+            Home
+          </Link>
+        </Button>
+      </header>
+
       <div className="glass-panel relative w-full max-w-sm rounded-3xl p-6 sm:p-8">
         <div className="mb-6 flex flex-col items-center gap-1 text-center">
-          <CheckCircle2 className="mb-1 size-8 text-primary" />
+          <LogoMark className="mb-1 size-9" />
           <h1 className="text-xl font-semibold">
             {mode === "signin" ? "Welcome back" : "Create your account"}
           </h1>
