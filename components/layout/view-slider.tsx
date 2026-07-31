@@ -64,10 +64,10 @@ export function ViewSlider() {
   }, [active]);
 
   return (
-    <div className="sticky top-14 z-20 flex justify-center px-3 py-3">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] md:pl-64">
       <nav
         aria-label="Views"
-        className="glass-panel max-w-full overflow-x-auto rounded-full p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="glass-panel pointer-events-auto max-w-full overflow-x-auto rounded-full p-1 shadow-2xl shadow-black/20 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <div ref={listRef} className="relative flex items-center gap-0.5">
           {/* The sliding thumb — starts transparent so it never flashes at 0

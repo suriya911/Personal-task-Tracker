@@ -92,14 +92,13 @@ export default async function AppLayout({
         {sidebar && <Sidebar data={sidebar} />}
         {/* min-w-0: without it the flex item refuses to shrink below its
             content's min-content width and the page scrolls sideways. */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          {/* One view switcher for every screen size — the slider replaces the
-              old phone-only bottom bar, so phone and desktop navigate alike. */}
-          {sidebar && <ViewSlider />}
-          {children}
-        </div>
+        {/* pb clears the floating slider docked at the bottom. */}
+        <div className="flex min-w-0 flex-1 flex-col pb-20">{children}</div>
       </div>
 
+      {/* One view switcher for every screen size, docked to the bottom — the
+          slider replaces the old phone-only nav, so phone and desktop match. */}
+      {sidebar && <ViewSlider />}
       {sidebar && (
         <CommandMenu
           projects={sidebar.projects.map((p) => ({ id: p.id, name: p.name }))}
