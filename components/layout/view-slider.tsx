@@ -50,6 +50,7 @@ export function ViewSlider() {
       // which would shift every index by one.
       const el = list.querySelectorAll("a")[active];
       if (!el) return;
+
       thumb.style.left = `${el.offsetLeft}px`;
       thumb.style.width = `${el.offsetWidth}px`;
       thumb.style.opacity = "1";
@@ -92,7 +93,7 @@ export function ViewSlider() {
         for (const a of links()) {
           const r = a.getBoundingClientRect();
           const d = Math.abs(e.clientX - (r.left + r.width / 2));
-          // Cosine falloff — eases to zero at the edge instead of clipping.
+          // Falloff eases to zero at the edge instead of clipping.
           const t = Math.max(0, 1 - d / REACH);
           const lift = MAX_LIFT * (t * t * (3 - 2 * t)); // smoothstep
           a.style.transform = `scale(${1 + lift}) translateY(${-lift * 6}px)`;
@@ -142,8 +143,8 @@ export function ViewSlider() {
             }}
             className={cn(
               "absolute inset-y-0 left-0 w-0 rounded-full",
-              // Liquid glass: a lit top edge, a soft floor, and a faint tint
-              // that lets the backdrop through rather than covering it.
+              // Liquid glass: a lit top edge, a soft floor, and a tint faint
+              // enough that the wallpaper still reads through it.
               "bg-gradient-to-b from-white/25 to-white/5 dark:from-white/20 dark:to-white/[0.04]",
               "shadow-[inset_0_1px_0_rgba(255,255,255,.5),inset_0_-1px_0_rgba(0,0,0,.06),0_2px_8px_-2px_rgba(0,0,0,.25)]",
               "ring-1 ring-white/25 backdrop-blur-sm dark:ring-white/10",
@@ -170,10 +171,24 @@ export function ViewSlider() {
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <v.icon className="size-4 shrink-0" />
-                {/* The label is the point of the control, so it stays at every
-                    width — the strip scrolls instead of dropping to icons. */}
-                {v.label}
+                {/* Content is magnified rather than the whole segment: the
+                    glass capsule keeps its measured size while what sits under
+                    it swells, which is how a loupe behaves. Rides the same
+                    spring as the thumb so they arrive together. */}
+                <span
+                  className={cn(
+                    "flex items-center gap-1.5 transition-transform duration-500 motion-reduce:transition-none",
+                    isActive && "scale-[1.14]",
+                  )}
+                  style={{
+                    transitionTimingFunction: "cubic-bezier(.34,1.42,.5,1)",
+                  }}
+                >
+                  <v.icon className="size-4 shrink-0" />
+                  {/* The label is the point of the control, so it stays at
+                      every width — the strip scrolls instead of shedding it. */}
+                  {v.label}
+                </span>
               </Link>
             );
           })}
