@@ -4,6 +4,8 @@ import {
   formatDayHeader,
   priorityBarClass,
   nextPostpone,
+  shiftDue,
+  canPrepone,
 } from "@/lib/tasks";
 import type { Task } from "@/types/models";
 
@@ -117,5 +119,88 @@ describe("nextPostpone", () => {
     );
     expect(r.due_date).toBe("2026-07-16");
     expect(r.original_due_date).toBe("2026-07-15");
+  });
+});
+
+describe("shiftDue", () => {
+  const today = "2026-07-15";
+
+  it("+1 is exactly nextPostpone", () => {
+    const s = {
+      due_date: "2026-07-20",
+      original_due_date: null,
+      postponed_count: 2,
+    };
+    expect(shiftDue(s, 1, today)).toEqual(nextPostpone(s, today));
+  });
+
+  it("-1 pulls the task one day earlier", () => {
+    const r = shiftDue(
+      { due_date: "2026-07-20", original_due_date: null, postponed_count: 0 },
+      -1,
+      today,
+    );
+    expect(r.due_date).toBe("2026-07-19");
+  });
+
+  it("-1 undoes a postpone: the counter comes back down", () => {
+    const r = shiftDue(
+      {
+        due_date: "2026-07-20",
+        original_due_date: "2026-07-17",
+        postponed_count: 3,
+      },
+      -1,
+      today,
+    );
+    expect(r.postponed_count).toBe(2);
+    expect(r.original_due_date).toBe("2026-07-17"); // still postponed overall
+  });
+
+  it("clears original_due_date once the count returns to zero", () => {
+    const r = shiftDue(
+      {
+        due_date: "2026-07-16",
+        original_due_date: "2026-07-15",
+        postponed_count: 1,
+      },
+      -1,
+      today,
+    );
+    expect(r.postponed_count).toBe(0);
+    expect(r.original_due_date).toBeNull();
+  });
+
+  it("never moves a task into the past", () => {
+    const r = shiftDue(
+      { due_date: "2026-07-15", original_due_date: null, postponed_count: 0 },
+      -1,
+      today,
+    );
+    expect(r.due_date).toBe(today);
+  });
+
+  it("postpone then prepone round-trips back to the start", () => {
+    const start = {
+      due_date: "2026-07-20",
+      original_due_date: null,
+      postponed_count: 0,
+    };
+    const there = shiftDue(start, 1, today);
+    const back = shiftDue(there, -1, today);
+    expect(back.due_date).toBe(start.due_date);
+    expect(back.postponed_count).toBe(0);
+    expect(back.original_due_date).toBeNull();
+  });
+});
+
+describe("canPrepone", () => {
+  const today = "2026-07-15";
+
+  it("allows pulling forward only while the task is beyond today", () => {
+    expect(canPrepone("2026-07-16", today)).toBe(true);
+    expect(canPrepone("2026-07-15", today)).toBe(false); // already today
+    expect(canPrepone("2026-07-10", today)).toBe(false); // overdue
+    expect(canPrepone(null, today)).toBe(false); // no date
   });
 });

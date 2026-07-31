@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createTaskSchema, updateTaskSchema } from "@/lib/validations";
-import { todayStr, nextPostpone } from "@/lib/tasks";
+import { todayStr, nextPostpone, shiftDue } from "@/lib/tasks";
 import { categorizeTask } from "@/lib/categorize";
 import type { CreateTaskInput, UpdateTaskInput } from "@/lib/validations";
 
@@ -168,6 +168,50 @@ export async function postponeTask(id: string): Promise<PostponeResult> {
   };
 
   const next = nextPostpone(prev);
+
+  const { error } = await supabase
+    .from("tasks")
+    .update({
+      due_date: next.due_date,
+      postponed_count: next.postponed_count,
+      original_due_date: next.original_due_date,
+    })
+    .eq("id", id);
+
+  if (error) return { ok: false, error: error.message };
+  revalidateAll();
+  return { ok: true, prev };
+}
+
+/**
+ * Move a task's due date by a day in either direction. `+1` postpones (same
+ * path as postponeTask), `-1` prepones. Returns the previous snapshot so the
+ * caller can offer Undo.
+ */
+export async function shiftTaskDue(
+  id: string,
+  delta: 1 | -1,
+): Promise<PostponeResult> {
+  const { supabase, userId } = await requireUser();
+  if (!supabase || !userId) return { ok: false, error: "Not signed in" };
+
+  const { data: task, error: readErr } = await supabase
+    .from("tasks")
+    .select("due_date, original_due_date, postponed_count")
+    .eq("id", id)
+    .single();
+
+  if (readErr || !task) {
+    return { ok: false, error: readErr?.message ?? "Task not found" };
+  }
+
+  const prev: Snapshot = {
+    due_date: task.due_date,
+    original_due_date: task.original_due_date,
+    postponed_count: task.postponed_count,
+  };
+
+  const next = shiftDue(prev, delta);
 
   const { error } = await supabase
     .from("tasks")

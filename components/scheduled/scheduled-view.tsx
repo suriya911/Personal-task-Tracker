@@ -66,6 +66,7 @@ export function ScheduledView({
                       onDelete={c.onDelete}
                       onEdit={c.onEdit}
                       onPostpone={c.onPostpone}
+                      onPrepone={c.onPrepone}
                     />
                   ))}
                 </div>

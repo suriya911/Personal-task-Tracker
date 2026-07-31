@@ -1,14 +1,14 @@
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
-import { addDays, format, parseISO } from "date-fns";
 import { toast } from "sonner";
 import {
   toggleComplete,
   deleteTask,
-  postponeTask,
+  shiftTaskDue,
   restorePostpone,
 } from "@/lib/actions/tasks";
+import { shiftDue } from "@/lib/tasks";
 import type { Task } from "@/types/models";
 
 type Snapshot = {
@@ -91,29 +91,42 @@ export function useTaskCollection(initial: Task[]) {
     });
   }
 
-  function onPostpone(task: Task) {
-    const base = task.due_date ? parseISO(task.due_date) : new Date();
-    const nextDue = format(addDays(base, 1), "yyyy-MM-dd");
+  /** Move the due date a day in either direction. */
+  function shift(task: Task, delta: 1 | -1) {
+    // Derive the optimistic date from the same pure helper the server uses —
+    // rolling our own here drifted for overdue tasks, which anchor to today.
+    const next = shiftDue(
+      {
+        due_date: task.due_date,
+        original_due_date: task.original_due_date,
+        postponed_count: task.postponed_count,
+      },
+      delta,
+    );
+
     startTransition(async () => {
       dispatch({
         type: "patch",
         id: task.id,
         patch: {
-          due_date: nextDue,
-          postponed_count: task.postponed_count + 1,
-          original_due_date: task.original_due_date ?? task.due_date ?? nextDue,
+          due_date: next.due_date,
+          postponed_count: next.postponed_count,
+          original_due_date: next.original_due_date,
         },
       });
-      const res = await postponeTask(task.id);
+      const res = await shiftTaskDue(task.id, delta);
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
-      toast.success("Moved to tomorrow", {
+      toast.success(delta === 1 ? "Moved to tomorrow" : "Moved a day earlier", {
         action: { label: "Undo", onClick: () => undoPostpone(task.id, res.prev) },
       });
     });
   }
+
+  const onPostpone = (task: Task) => shift(task, 1);
+  const onPrepone = (task: Task) => shift(task, -1);
 
   return {
     tasks,
@@ -124,6 +137,7 @@ export function useTaskCollection(initial: Task[]) {
     onDelete,
     onEdit,
     onPostpone,
+    onPrepone,
     onSaved,
     onAdd,
   };

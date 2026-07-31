@@ -1,11 +1,16 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { Trash2, Repeat } from "lucide-react";
+import { Trash2, Repeat, ChevronLeft } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { priorityBarClass } from "@/lib/tasks";
+import { canPrepone, priorityBarClass } from "@/lib/tasks";
 import { PostponeButton } from "@/components/tasks/postpone-button";
 import type { Task } from "@/types/models";
 
@@ -15,6 +20,8 @@ interface TaskItemProps {
   onDelete: (task: Task) => void;
   onEdit: (task: Task) => void;
   onPostpone: (task: Task) => void;
+  /** Omit to hide the prepone control (Today, where it can never apply). */
+  onPrepone?: (task: Task) => void;
   showDueDate?: boolean;
 }
 
@@ -24,6 +31,7 @@ export function TaskItem({
   onDelete,
   onEdit,
   onPostpone,
+  onPrepone,
   showDueDate,
 }: TaskItemProps) {
   const done = task.status === "done";
@@ -99,6 +107,29 @@ export function TaskItem({
       </button>
 
       <div className="flex items-center opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+        {/* Pull forward a day. Only meaningful while the task is still ahead
+            of today, which is why Scheduled is where this earns its place. */}
+        {!done && onPrepone && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                disabled={!canPrepone(task.due_date)}
+                onClick={() => onPrepone(task)}
+                className="touch-target size-8 text-muted-foreground"
+                aria-label="Move one day earlier"
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {canPrepone(task.due_date)
+                ? "One day earlier"
+                : "Already due today"}
+            </TooltipContent>
+          </Tooltip>
+        )}
         {!done && <PostponeButton onPostpone={() => onPostpone(task)} />}
         <Button
           size="icon"

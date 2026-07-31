@@ -39,6 +39,45 @@ export function nextPostpone(
 }
 
 /**
+ * Move a due date by whole days in either direction.
+ *
+ * `+1` is the postpone case and matches `nextPostpone` exactly (overdue tasks
+ * anchor to today so they land on tomorrow). `-1` pulls a task forward and
+ * *undoes* a postpone: the counter comes back down, and once it reaches zero
+ * the original-due-date marker is cleared, so "postponed 3×" stays truthful.
+ *
+ * Never returns a date before today — pulling a task into the past would make
+ * it instantly overdue, which is never what "do it sooner" means. Callers
+ * should use `canPrepone` to disable the control instead of relying on this.
+ */
+export function shiftDue(
+  s: PostponeSnapshot,
+  delta: 1 | -1,
+  today = todayStr(),
+): PostponeSnapshot {
+  if (delta === 1) return nextPostpone(s, today);
+
+  const base = s.due_date ? parseISO(s.due_date) : parseISO(today);
+  const moved = addDays(base, -1);
+  const clamped = format(moved, "yyyy-MM-dd") < today ? parseISO(today) : moved;
+  const count = Math.max(0, s.postponed_count - 1);
+
+  return {
+    due_date: format(clamped, "yyyy-MM-dd"),
+    postponed_count: count,
+    original_due_date: count === 0 ? null : s.original_due_date,
+  };
+}
+
+/** A task can only be pulled forward while it still sits beyond today. */
+export function canPrepone(
+  dueDate: string | null,
+  today = todayStr(),
+): boolean {
+  return !!dueDate && dueDate > today;
+}
+
+/**
  * Day-group header: relative wording for the next 7 days, absolute beyond.
  * "Tomorrow" · "Thursday, Jul 16" · "Mon, Aug 3"
  */

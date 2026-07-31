@@ -53,11 +53,12 @@ export default async function DashboardPage() {
 
   // Everything still open, overdue first — the actionable queue.
   const stamp = todayStr();
-  const pending: PendingTask[] = [
+  const openTasks = [
     ...today.overdue,
     ...today.today.filter((t) => t.status !== "done"),
     ...today.noDate,
-  ].map((t) => ({
+  ];
+  const pending: PendingTask[] = openTasks.map((t) => ({
     id: t.id,
     title: t.title,
     dueDate: t.due_date,
@@ -138,7 +139,12 @@ export default async function DashboardPage() {
             </h2>
             <OpenLink href="/" label="Open Today" />
           </div>
-          <PendingTasks initial={pending} />
+          <PendingTasks
+            initial={pending}
+            full={openTasks}
+            categories={categories}
+            today={stamp}
+          />
         </section>
       </div>
     </main>

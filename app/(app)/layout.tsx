@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
 import { getSidebarData } from "@/lib/queries/sidebar";
 import { Sidebar } from "@/components/layout/sidebar";
-import { MobileNav } from "@/components/layout/mobile-nav";
+import { ViewSlider } from "@/components/layout/view-slider";
 import { Backdrop } from "@/components/layout/backdrop";
 import { BackdropPicker } from "@/components/layout/backdrop-picker";
 import { CommandMenu } from "@/components/layout/command-menu";
@@ -92,12 +92,14 @@ export default async function AppLayout({
         {sidebar && <Sidebar data={sidebar} />}
         {/* min-w-0: without it the flex item refuses to shrink below its
             content's min-content width and the page scrolls sideways. */}
-        <div className="flex min-w-0 flex-1 flex-col pb-16 md:pb-0">
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* One view switcher for every screen size — the slider replaces the
+              old phone-only bottom bar, so phone and desktop navigate alike. */}
+          {sidebar && <ViewSlider />}
           {children}
         </div>
       </div>
 
-      {sidebar && <MobileNav />}
       {sidebar && (
         <CommandMenu
           projects={sidebar.projects.map((p) => ({ id: p.id, name: p.name }))}

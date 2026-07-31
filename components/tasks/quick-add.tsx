@@ -38,7 +38,7 @@ export function QuickAdd({ onAdd }: QuickAddProps) {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 flex justify-center px-4 md:bottom-6 md:pl-64">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-40 flex justify-center px-4 md:bottom-6 md:pl-64">
       <form
         onSubmit={submit}
         className="glass-panel pointer-events-auto flex w-full max-w-xl items-center gap-2 rounded-full py-1.5 pr-3 pl-1.5 shadow-2xl shadow-black/20 transition-shadow focus-within:ring-1 focus-within:ring-primary/40 focus-within:shadow-primary/10"
