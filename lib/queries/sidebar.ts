@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
+import { createClient, getSessionUser } from "@/lib/supabase/server";
 import { todayStr } from "@/lib/tasks";
 import type { CategoryRow } from "@/types/models";
 import type { ProjectRow } from "@/lib/queries/projects";
@@ -17,12 +18,12 @@ const EMPTY: SidebarData = {
   counts: { today: 0, important: 0, scheduled: 0 },
 };
 
-export async function getSidebarData(): Promise<SidebarData> {
+/** Cached per request: the layout renders the sidebar and the dashboard reads
+ *  the same projects, and without this both pay for the whole query set. */
+export const getSidebarData = cache(async function getSidebarData(): Promise<SidebarData> {
   const supabase = await createClient();
   if (!supabase) return EMPTY;
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return EMPTY;
 
   const today = todayStr();
@@ -56,4 +57,4 @@ export async function getSidebarData(): Promise<SidebarData> {
       scheduled: rows.filter((t) => t.due_date && t.due_date > today).length,
     },
   };
-}
+});

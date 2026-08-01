@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getSessionUser } from "@/lib/supabase/server";
 import { taskComparator } from "@/lib/tasks";
 import type { Task } from "@/types/models";
 import type { Database } from "@/types/database";
@@ -13,9 +13,7 @@ export async function getProjects(): Promise<
 > {
   const supabase = await createClient();
   if (!supabase) return [];
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return [];
 
   const [{ data: projects }, { data: tasks }] = await Promise.all([
@@ -40,9 +38,7 @@ export async function getProject(id: string): Promise<{
 }> {
   const supabase = await createClient();
   if (!supabase) return { authed: false, project: null, tasks: [] };
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return { authed: false, project: null, tasks: [] };
 
   const [{ data: project }, { data: tasks }] = await Promise.all([

@@ -1,5 +1,5 @@
 import { endOfMonth, format, startOfMonth } from "date-fns";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getSessionUser } from "@/lib/supabase/server";
 import { taskComparator, todayStr } from "@/lib/tasks";
 import type { Task } from "@/types/models";
 
@@ -27,9 +27,7 @@ export async function getTodayData(): Promise<TodayData> {
   const supabase = await createClient();
   if (!supabase) return EMPTY;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return EMPTY;
 
   const today = todayStr();
@@ -74,9 +72,7 @@ export async function getImportantTasks(): Promise<{
   const supabase = await createClient();
   if (!supabase) return { authed: false, tasks: [] };
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return { authed: false, tasks: [] };
 
   const { data } = await supabase
@@ -100,9 +96,7 @@ export async function getScheduledTasks(): Promise<{
 }> {
   const supabase = await createClient();
   if (!supabase) return { authed: false, days: [], noDate: [] };
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return { authed: false, days: [], noDate: [] };
 
   const today = todayStr();
@@ -149,9 +143,7 @@ export async function getMonthTasks(month: Date): Promise<{
 }> {
   const supabase = await createClient();
   if (!supabase) return { authed: false, byDate: {} };
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return { authed: false, byDate: {} };
 
   const start = format(startOfMonth(month), "yyyy-MM-dd");

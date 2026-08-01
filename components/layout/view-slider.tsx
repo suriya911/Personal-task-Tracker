@@ -190,7 +190,7 @@ export function ViewSlider() {
               // The lit state comes from data-glass, set by the pointer layer,
               // so hover and route never disagree about which one is lit.
               className={cn(
-                "group relative z-10 flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium whitespace-nowrap sm:px-4 sm:text-sm",
+                "group relative z-10 flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium whitespace-nowrap sm:text-sm",
                 // transform eases separately from the Dock-proximity writes,
                 // and origin-bottom makes the swell grow up out of the pill.
                 "origin-bottom transition-[color,transform] duration-200 ease-out",
@@ -200,9 +200,10 @@ export function ViewSlider() {
             >
               <span className="flex items-center gap-1.5 transition-transform duration-300 group-data-glass:scale-[1.14] motion-reduce:transition-none">
                 <v.icon className="size-4 shrink-0" />
-                {/* The label is the point of the control, so it stays at every
-                    width — the strip scrolls instead of dropping to icons. */}
-                {v.label}
+                {/* Phones get icons only, so all five fit without scrolling;
+                    the label returns from sm up. Screen readers always read
+                    it, since it stays in the DOM. */}
+                <span className="sr-only sm:not-sr-only">{v.label}</span>
               </span>
             </Link>
           ))}

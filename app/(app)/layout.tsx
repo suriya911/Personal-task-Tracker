@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getSessionUser } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
 import { getSidebarData } from "@/lib/queries/sidebar";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -31,16 +31,8 @@ export default async function AppLayout({
 
   // Belt-and-suspenders with middleware. When Supabase isn't configured yet,
   // fall through and let the page render its "not connected" panel.
-  if (supabase) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) redirect("/login");
-  }
-
-  const user = supabase
-    ? (await supabase.auth.getUser()).data.user
-    : null;
+  const user = await getSessionUser();
+  if (supabase && !user) redirect("/login");
 
   const email = user?.email ?? "";
   const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;

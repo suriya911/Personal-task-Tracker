@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { subDays, parseISO, format } from "date-fns";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getSessionUser } from "@/lib/supabase/server";
 import { getOccurrencesBetween, type RecurrenceRule } from "@/lib/recurrence";
 
 /**
@@ -49,43 +49,53 @@ async function purgeStaleRecurringInstances(
 export async function materializeRecurring(today: string): Promise<void> {
   const supabase = await createClient();
   if (!supabase) return;
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return;
 
-  await purgeStaleRecurringInstances(supabase, today);
+  // The purge and the template read don't depend on each other, so they go
+  // out together rather than one after the other.
+  const [, { data: templates }] = await Promise.all([
+    purgeStaleRecurringInstances(supabase, today),
+    supabase
+      .from("tasks")
+      .select(
+        "id, title, category_id, priority, is_important, recurrence_id, rule:recurrence_rules(*)",
+      )
+      .eq("is_recurrence_template", true)
+      .not("recurrence_id", "is", null),
+  ]);
 
-  const { data: templates } = await supabase
-    .from("tasks")
-    .select(
-      "id, title, category_id, priority, is_important, recurrence_id, rule:recurrence_rules(*)",
-    )
-    .eq("is_recurrence_template", true)
-    .not("recurrence_id", "is", null);
-
-  if (!templates) return;
+  if (!templates || templates.length === 0) return;
 
   // Look back a bounded window so daily rules with old anchors stay cheap.
   const windowStart = format(subDays(parseISO(today), 366), "yyyy-MM-dd");
 
-  for (const tpl of templates) {
+  // Work out every template's target date first, then settle all of them in
+  // one round trip each rather than a serial query-per-template walk.
+  const wanted = templates.flatMap((tpl) => {
     const rule = (tpl as { rule: RecurrenceRule | null }).rule;
-    if (!rule) continue;
-
+    if (!rule) return [];
     const occ = getOccurrencesBetween(rule, windowStart, today);
     const target = occ[occ.length - 1];
-    if (!target) continue;
+    return target ? [{ tpl, target }] : [];
+  });
 
-    // Fast path: skip if an instance already exists for this occurrence.
-    const { count } = await supabase
-      .from("tasks")
-      .select("id", { count: "exact", head: true })
-      .eq("recurrence_id", tpl.recurrence_id!)
-      .eq("due_date", target)
-      .eq("is_recurrence_template", false);
+  if (wanted.length === 0) return;
 
-    if ((count ?? 0) > 0) continue;
+  // One query answers "which of these already exist?" for every template.
+  const { data: existing } = await supabase
+    .from("tasks")
+    .select("recurrence_id, due_date")
+    .eq("is_recurrence_template", false)
+    .in("recurrence_id", wanted.map((w) => w.tpl.recurrence_id!))
+    .in("due_date", [...new Set(wanted.map((w) => w.target))]);
+
+  const have = new Set(
+    (existing ?? []).map((r) => `${r.recurrence_id}:${r.due_date}`),
+  );
+
+  for (const { tpl, target } of wanted) {
+    if (have.has(`${tpl.recurrence_id}:${target}`)) continue;
 
     // Deterministic id makes concurrent inserts collide instead of duplicating.
     const { error } = await supabase.from("tasks").insert({

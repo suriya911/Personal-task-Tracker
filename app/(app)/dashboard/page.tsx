@@ -11,7 +11,7 @@ import {
   PendingTasks,
   type PendingTask,
 } from "@/components/home/pending-tasks";
-import { AddTaskDialog } from "@/components/tasks/add-task-dialog";
+import { QuickAdd } from "@/components/tasks/quick-add";
 import { getCategories } from "@/lib/queries/categories";
 import { getSidebarData } from "@/lib/queries/sidebar";
 import { materializeRecurring } from "@/lib/recurrence-server";
@@ -81,7 +81,8 @@ export default async function DashboardPage() {
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <main className="flex flex-1 flex-col items-center px-4 pt-8 pb-24 sm:px-6 sm:pt-12">
+    // pb clears the docked quick-add pill and the slider beneath it.
+    <main className="flex flex-1 flex-col items-center px-4 pt-8 pb-36 sm:px-6 sm:pt-12">
       <div className="w-full max-w-4xl">
         <header className="mb-6 flex items-start justify-between gap-4">
           <div>
@@ -98,11 +99,6 @@ export default async function DashboardPage() {
                   }.`}
             </p>
           </div>
-          <AddTaskDialog
-            categories={categories}
-            projects={sidebar.projects.map((p) => ({ id: p.id, name: p.name }))}
-            className="shrink-0"
-          />
         </header>
 
         {/* Two windows: side by side from lg up (below that the sidebar
@@ -147,6 +143,12 @@ export default async function DashboardPage() {
           />
         </section>
       </div>
+
+      {/* Same docked pill as Today — the one way to add a task. */}
+      <QuickAdd
+        categories={categories}
+        projects={sidebar.projects.map((p) => ({ id: p.id, name: p.name }))}
+      />
     </main>
   );
 }

@@ -3,17 +3,13 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import { QuickAdd } from "@/components/tasks/quick-add";
+import { QuickAdd, type QuickAddDraft } from "@/components/tasks/quick-add";
 import { TaskItem } from "@/components/tasks/task-item";
 import { TaskListCard } from "@/components/tasks/task-list-card";
 import { ProgressRing } from "@/components/tasks/progress-ring";
 import { TaskDialog } from "@/components/tasks/task-dialog";
+import type { ProjectOption } from "@/components/tasks/add-task-dialog";
 import {
-  AddTaskDialog,
-  type ProjectOption,
-} from "@/components/tasks/add-task-dialog";
-import {
-  createTask,
   toggleComplete,
   deleteTask,
   postponeTask,
@@ -96,21 +92,26 @@ export function TodayView({
   const total = todaySec.length;
   const allEmpty = overdue.length + todaySec.length + noDate.length === 0;
 
-  function handleAdd(title: string) {
+  /**
+   * Paint the new row immediately. QuickAdd owns the write itself, so this
+   * only mirrors the draft into the optimistic list; the server revalidate
+   * replaces it with the real row (with its id and resolved category).
+   */
+  function handleOptimisticAdd(draft: QuickAddDraft) {
     const optimisticTask: Task = {
       id: crypto.randomUUID(),
       user_id: "optimistic",
-      category_id: null,
-      project_id: null,
+      category_id: draft.category_id,
+      project_id: draft.project_id,
       parent_task_id: null,
       recurrence_id: null,
       is_recurrence_template: false,
-      title,
+      title: draft.title,
       description: null,
       status: "todo",
-      priority: "medium",
-      is_important: false,
-      due_date: today,
+      priority: draft.priority,
+      is_important: draft.is_important,
+      due_date: draft.due_date,
       due_time: null,
       reminder_at: null,
       postponed_count: 0,
@@ -119,13 +120,10 @@ export function TodayView({
       position: -Date.now(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      category: null,
+      category:
+        categories.find((c) => c.id === draft.category_id) ?? null,
     };
-    startTransition(async () => {
-      dispatch({ type: "add", task: optimisticTask });
-      const res = await createTask({ title });
-      if (!res.ok) toast.error(res.error);
-    });
+    dispatch({ type: "add", task: optimisticTask });
   }
 
   function handleToggle(task: Task, checked: boolean) {
@@ -206,10 +204,7 @@ export function TodayView({
               : `${done} of ${total} done today.`}
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <AddTaskDialog categories={categories} projects={projects} />
-          {total > 0 && <ProgressRing done={done} total={total} />}
-        </div>
+        {total > 0 && <ProgressRing done={done} total={total} />}
       </header>
 
       {allEmpty ? (
@@ -282,7 +277,11 @@ export function TodayView({
         onSaved={handleSaved}
       />
 
-      <QuickAdd onAdd={handleAdd} />
+      <QuickAdd
+        categories={categories}
+        projects={projects}
+        onOptimistic={handleOptimisticAdd}
+      />
     </div>
   );
 }

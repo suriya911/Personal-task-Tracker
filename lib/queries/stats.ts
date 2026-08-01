@@ -1,5 +1,5 @@
 import { format, parseISO, subDays } from "date-fns";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getSessionUser } from "@/lib/supabase/server";
 import { todayStr } from "@/lib/tasks";
 import { dayIn } from "@/lib/timezone";
 
@@ -62,9 +62,7 @@ export async function getStats(): Promise<StatsData> {
   const supabase = await createClient();
   if (!supabase) return EMPTY;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return EMPTY;
 
   const today = todayStr();
