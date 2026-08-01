@@ -301,6 +301,14 @@
   }
 }
 
+/* Task rows carry their own view-transition name, so when the list re-sorts
+   the browser tweens each row from its old slot to its new one. Ticking a
+   task therefore slides it down to the finished pile rather than jumping. */
+::view-transition-group(.task-row) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),

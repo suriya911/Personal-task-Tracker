@@ -1,5 +1,6 @@
 "use client";
 
+import { ViewTransition } from "react";
 import { format, parseISO } from "date-fns";
 import { Trash2, Repeat, ChevronLeft } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,13 +38,19 @@ export function TaskItem({
   const done = task.status === "done";
 
   return (
-    <div
-      className={cn(
-        "group relative flex items-center gap-3 rounded-lg pl-3 pr-2 py-2.5",
-        "transition-colors duration-100 hover:bg-muted/40",
-        done && "opacity-50",
-      )}
-    >
+    // Naming the row lets the browser tween it from its old slot to its new
+    // one when the list re-sorts — so ticking a task visibly slides it down
+    // to the finished pile instead of teleporting there.
+    // `default="none"` keeps rows out of unrelated transitions — without it
+    // every route change would pull each row out of the page's own dissolve.
+    <ViewTransition name={`task-${task.id}`} update="task-row" default="none">
+      <div
+        className={cn(
+          "group relative flex items-center gap-3 rounded-lg pl-3 pr-2 py-2.5",
+          "transition-colors duration-100 hover:bg-muted/40",
+          done && "opacity-50",
+        )}
+      >
       {/* Priority left-edge bar */}
       <span
         aria-hidden
@@ -140,7 +147,8 @@ export function TaskItem({
         >
           <Trash2 className="size-4" />
         </Button>
+        </div>
       </div>
-    </div>
+    </ViewTransition>
   );
 }

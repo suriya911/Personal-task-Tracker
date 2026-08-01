@@ -89,13 +89,42 @@ export function formatDayHeader(dateStr: string, today: string): string {
   return format(date, "EEE, MMM d");
 }
 
-const PRIORITY_RANK: Record<TaskPriority, number> = { high: 0, medium: 1, low: 2 };
-
-/** Sort order used everywhere: important → priority → position. */
+/**
+ * Sort order used everywhere:
+ *   still to do → important → title A–Z → category → position
+ *
+ * Finished work sinks to the bottom of its section instead of holding a slot
+ * in the middle of the list. `position` only ever breaks a tie between two
+ * tasks that match on every other key, so the order stays stable.
+ *
+ * Note that titles are compared before categories, so the list reads as one
+ * alphabetical run rather than grouping into category blocks — category only
+ * separates two tasks that share a title.
+ */
 export function taskComparator(a: Task, b: Task): number {
+  const aDone = a.status === "done";
+  const bDone = b.status === "done";
+  if (aDone !== bDone) return aDone ? 1 : -1;
+
   if (a.is_important !== b.is_important) return a.is_important ? -1 : 1;
-  const p = PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
-  if (p !== 0) return p;
+
+  // `numeric` so "Step 2" precedes "Step 10"; `base` so case and accents
+  // don't split otherwise-identical titles.
+  const byTitle = a.title.localeCompare(b.title, undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+  if (byTitle !== 0) return byTitle;
+
+  // Uncategorised sorts after everything named, rather than jumping to the
+  // top the way an empty string would.
+  const aCat = a.category?.name ?? "￿";
+  const bCat = b.category?.name ?? "￿";
+  const byCategory = aCat.localeCompare(bCat, undefined, {
+    sensitivity: "base",
+  });
+  if (byCategory !== 0) return byCategory;
+
   return a.position - b.position;
 }
 

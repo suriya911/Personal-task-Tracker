@@ -37,22 +37,73 @@ const task = (over: Partial<Task>): Task =>
   }) as Task;
 
 describe("taskComparator", () => {
-  it("important beats high priority", () => {
-    const important = task({ is_important: true, priority: "low" });
-    const highPrio = task({ is_important: false, priority: "high" });
-    expect([highPrio, important].sort(taskComparator)[0]).toBe(important);
+  it("sinks finished tasks below unfinished ones", () => {
+    const done = task({ status: "done", is_important: true, title: "aaa" });
+    const todo = task({ status: "todo", is_important: false, title: "zzz" });
+    // Done loses even holding importance and an earlier title.
+    expect([done, todo].sort(taskComparator)[0]).toBe(todo);
   });
 
-  it("orders by priority when importance is equal", () => {
-    const high = task({ priority: "high" });
-    const low = task({ priority: "low" });
-    expect([low, high].sort(taskComparator)[0]).toBe(high);
+  it("keeps finished tasks sorted among themselves", () => {
+    const b = task({ status: "done", title: "beta" });
+    const a = task({ status: "done", title: "alpha" });
+    expect([b, a].sort(taskComparator).map((t) => t.title)).toEqual([
+      "alpha",
+      "beta",
+    ]);
   });
 
-  it("falls back to position", () => {
-    const a = task({ position: 1 });
-    const b = task({ position: 0 });
+  it("puts important first among unfinished tasks", () => {
+    const important = task({ is_important: true, title: "zzz" });
+    const normal = task({ is_important: false, title: "aaa" });
+    expect([normal, important].sort(taskComparator)[0]).toBe(important);
+  });
+
+  it("orders alphabetically once importance matches", () => {
+    const c = task({ title: "Carrots" });
+    const a = task({ title: "apples" }); // lower-case still sorts first
+    const b = task({ title: "Bananas" });
+    expect([c, a, b].sort(taskComparator).map((t) => t.title)).toEqual([
+      "apples",
+      "Bananas",
+      "Carrots",
+    ]);
+  });
+
+  it("sorts numbers in a title the way a human reads them", () => {
+    const ten = task({ title: "Step 10" });
+    const two = task({ title: "Step 2" });
+    expect([ten, two].sort(taskComparator)[0]).toBe(two);
+  });
+
+  it("separates identical titles by category, uncategorised last", () => {
+    const none = task({ title: "Review", category: null });
+    const work = task({
+      title: "Review",
+      category: { id: "1", name: "Work", color: "#fff", icon: "star" },
+    });
+    const admin = task({
+      title: "Review",
+      category: { id: "2", name: "Admin", color: "#fff", icon: "star" },
+    });
+    expect([none, work, admin].sort(taskComparator).map((t) => t.category?.name ?? null)).toEqual([
+      "Admin",
+      "Work",
+      null,
+    ]);
+  });
+
+  it("falls back to position when everything else matches", () => {
+    const a = task({ title: "same", position: 1 });
+    const b = task({ title: "same", position: 0 });
     expect([a, b].sort(taskComparator)[0]).toBe(b);
+  });
+
+  it("no longer lets priority drive the order", () => {
+    const low = task({ priority: "low", title: "aaa" });
+    const high = task({ priority: "high", title: "bbb" });
+    // Alphabetical wins; priority is now purely the colour bar.
+    expect([high, low].sort(taskComparator)[0]).toBe(low);
   });
 });
 
