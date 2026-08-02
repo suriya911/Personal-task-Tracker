@@ -7,7 +7,7 @@ import {
   CalendarDays,
   CalendarRange,
   LayoutDashboard,
-  Star,
+  Library,
   Sun,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ const VIEWS = [
   { href: "/", label: "Today", icon: Sun },
   { href: "/scheduled", label: "Scheduled", icon: CalendarRange },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
-  { href: "/important", label: "Important", icon: Star },
+  { href: "/collections", label: "Collections", icon: Library },
 ] as const;
 
 /**

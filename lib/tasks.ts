@@ -91,7 +91,7 @@ export function formatDayHeader(dateStr: string, today: string): string {
 
 /**
  * Sort order used everywhere:
- *   still to do → important → title A–Z → category → position
+ *   still to do → title A–Z → group → position
  *
  * Finished work sinks to the bottom of its section instead of holding a slot
  * in the middle of the list. `position` only ever breaks a tie between two
@@ -105,8 +105,6 @@ export function taskComparator(a: Task, b: Task): number {
   const aDone = a.status === "done";
   const bDone = b.status === "done";
   if (aDone !== bDone) return aDone ? 1 : -1;
-
-  if (a.is_important !== b.is_important) return a.is_important ? -1 : 1;
 
   // `numeric` so "Step 2" precedes "Step 10"; `base` so case and accents
   // don't split otherwise-identical titles.

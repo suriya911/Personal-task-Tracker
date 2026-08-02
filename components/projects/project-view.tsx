@@ -85,11 +85,11 @@ export function ProjectView({
       parent_task_id: null,
       recurrence_id: null,
       is_recurrence_template: false,
+      is_important: false, // column retained, no longer surfaced
       title: t,
       description: null,
       status: "todo",
       priority: "medium",
-      is_important: false,
       due_date: null,
       due_time: null,
       reminder_at: null,

@@ -8,7 +8,7 @@ import {
   CalendarDays,
   CalendarRange,
   LayoutDashboard,
-  Star,
+  Library,
   Sun,
   FolderKanban,
   Plus,
@@ -49,12 +49,7 @@ const VIEWS = [
     key: "scheduled" as const,
   },
   { href: "/calendar", label: "Calendar", icon: CalendarDays, key: null },
-  {
-    href: "/important",
-    label: "Important",
-    icon: Star,
-    key: "important" as const,
-  },
+  { href: "/collections", label: "Collections", icon: Library, key: null },
   { href: "/stats", label: "Statistics", icon: BarChart3, key: null },
 ];
 
@@ -94,7 +89,7 @@ export function Sidebar({ data }: { data: SidebarData }) {
       </nav>
 
       {data.categories.length > 0 && (
-        <Section label="Categories" action={<NewCategoryDialog />}>
+        <Section label="Groups" action={<NewCategoryDialog />}>
           {data.categories.map((c) => (
             <div
               key={c.id}
@@ -256,7 +251,7 @@ function NewProjectDialog({ data }: { data: SidebarData }) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Category</Label>
+            <Label>Group</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="None" />
@@ -298,7 +293,7 @@ function NewCategoryDialog() {
     start(async () => {
       const res = await createCategory({ name: n, color });
       if (res.ok) {
-        toast.success("Category created");
+        toast.success("Group created");
         setName("");
         setColor(SWATCHES[0]);
         setOpen(false);
@@ -311,13 +306,13 @@ function NewCategoryDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="icon" variant="ghost" className="size-6" aria-label="New category">
+        <Button size="icon" variant="ghost" className="size-6" aria-label="New group">
           <Plus className="size-3.5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>New category</DialogTitle>
+          <DialogTitle>New group</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">

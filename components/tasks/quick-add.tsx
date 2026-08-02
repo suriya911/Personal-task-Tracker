@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Loader2,
   Plus,
-  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -30,8 +29,7 @@ import { createTask } from "@/lib/actions/tasks";
 import { setTaskRecurrence } from "@/lib/actions/recurrence";
 import { todayStr } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
-import type { CategoryRow, TaskPriority } from "@/types/models";
-import type { ProjectOption } from "@/components/tasks/add-task-dialog";
+import type { GroupRow, ProjectOption, TaskPriority } from "@/types/models";
 
 type Repeat = "none" | "daily" | "weekly" | "monthly" | "yearly";
 
@@ -42,7 +40,6 @@ export interface QuickAddDraft {
   title: string;
   due_date: string | null;
   priority: TaskPriority;
-  is_important: boolean;
   category_id: string | null;
   project_id: string | null;
 }
@@ -61,7 +58,7 @@ export function QuickAdd({
   projects = [],
   onOptimistic,
 }: {
-  categories: CategoryRow[];
+  categories: GroupRow[];
   projects?: ProjectOption[];
   /** Lets Today paint the row instantly; the server revalidate reconciles. */
   onOptimistic?: (draft: QuickAddDraft) => void;
@@ -72,8 +69,7 @@ export function QuickAdd({
 
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<TaskPriority>("medium");
-  const [important, setImportant] = useState(false);
-  const [categoryId, setCategoryId] = useState(NO_CATEGORY);
+  const [categoryId, setGroupId] = useState(NO_CATEGORY);
   const [projectId, setProjectId] = useState(NO_PROJECT);
   const [dueDate, setDueDate] = useState<Date | undefined>(
     new Date(`${todayStr()}T00:00:00`),
@@ -97,8 +93,7 @@ export function QuickAdd({
 
   function resetOptions() {
     setPriority("medium");
-    setImportant(false);
-    setCategoryId(NO_CATEGORY);
+    setGroupId(NO_CATEGORY);
     setProjectId(NO_PROJECT);
     setDueDate(new Date(`${todayStr()}T00:00:00`));
     setDueTime("");
@@ -114,7 +109,6 @@ export function QuickAdd({
       title: t,
       due_date: dueDate ? format(dueDate, "yyyy-MM-dd") : null,
       priority,
-      is_important: important,
       category_id: categoryId === NO_CATEGORY ? null : categoryId,
       project_id: projectId === NO_PROJECT ? null : projectId,
     };
@@ -253,8 +247,8 @@ export function QuickAdd({
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs">Category</Label>
-                <Select value={categoryId} onValueChange={setCategoryId}>
+                <Label className="text-xs">Group</Label>
+                <Select value={categoryId} onValueChange={setGroupId}>
                   <SelectTrigger size="sm" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -287,18 +281,6 @@ export function QuickAdd({
                   </Select>
                 </div>
               )}
-
-              <Button
-                type="button"
-                variant={important ? "default" : "outline"}
-                size="sm"
-                onClick={() => setImportant((v) => !v)}
-                aria-pressed={important}
-                className="gap-1.5 sm:col-span-2"
-              >
-                <Star className={cn("size-4", important && "fill-current")} />
-                {important ? "Important" : "Mark important"}
-              </Button>
             </div>
           </div>
         </div>

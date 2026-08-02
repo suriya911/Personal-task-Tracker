@@ -22,7 +22,6 @@ const task = (over: Partial<Task>): Task =>
     description: null,
     status: "todo",
     priority: "medium",
-    is_important: false,
     due_date: null,
     due_time: null,
     reminder_at: null,
@@ -38,9 +37,9 @@ const task = (over: Partial<Task>): Task =>
 
 describe("taskComparator", () => {
   it("sinks finished tasks below unfinished ones", () => {
-    const done = task({ status: "done", is_important: true, title: "aaa" });
-    const todo = task({ status: "todo", is_important: false, title: "zzz" });
-    // Done loses even holding importance and an earlier title.
+    const done = task({ status: "done", title: "aaa" });
+    const todo = task({ status: "todo", title: "zzz" });
+    // Done loses even with an earlier title.
     expect([done, todo].sort(taskComparator)[0]).toBe(todo);
   });
 
@@ -51,12 +50,6 @@ describe("taskComparator", () => {
       "alpha",
       "beta",
     ]);
-  });
-
-  it("puts important first among unfinished tasks", () => {
-    const important = task({ is_important: true, title: "zzz" });
-    const normal = task({ is_important: false, title: "aaa" });
-    expect([normal, important].sort(taskComparator)[0]).toBe(important);
   });
 
   it("orders alphabetically once importance matches", () => {

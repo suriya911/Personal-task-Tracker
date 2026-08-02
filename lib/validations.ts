@@ -8,7 +8,6 @@ export const createTaskSchema = z.object({
   category_id: z.string().uuid().nullable().optional(),
   project_id: z.string().uuid().nullable().optional(),
   priority: z.enum(["low", "medium", "high"]).default("medium"),
-  is_important: z.boolean().default(false),
 });
 
 export const updateTaskSchema = createTaskSchema.partial().extend({

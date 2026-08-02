@@ -89,11 +89,6 @@ export function TaskItem({
           >
             {task.title}
           </span>
-          {task.is_important && (
-            <span className="text-amber-400" title="Important">
-              ★
-            </span>
-          )}
           {task.recurrence_id && (
             <Repeat
               className="size-3 shrink-0 text-muted-foreground"

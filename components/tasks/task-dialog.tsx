@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarIcon, Star, Loader2 } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -30,13 +30,13 @@ import { setTaskRecurrence } from "@/lib/actions/recurrence";
 import { NotesPanel } from "@/components/tasks/notes-panel";
 import { AttachmentsPanel } from "@/components/tasks/attachments-panel";
 import { Separator } from "@/components/ui/separator";
-import type { Task, TaskPriority, CategoryRow } from "@/types/models";
+import type { Task, TaskPriority, GroupRow } from "@/types/models";
 
 type Repeat = "none" | "daily" | "weekly" | "monthly" | "yearly";
 
 interface TaskDialogProps {
   task: Task | null;
-  categories: CategoryRow[];
+  categories: GroupRow[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSaved: (id: string, patch: Partial<Task>) => void;
@@ -57,7 +57,6 @@ export function TaskDialog({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<TaskPriority>("medium");
-  const [important, setImportant] = useState(false);
   const [categoryId, setCategoryId] = useState<string>(NO_CATEGORY);
   const [dueDate, setDueDate] = useState<string | null>(null);
   const [dueTime, setDueTime] = useState<string>("");
@@ -71,7 +70,6 @@ export function TaskDialog({
     setTitle(task.title);
     setDescription(task.description ?? "");
     setPriority(task.priority);
-    setImportant(task.is_important);
     setCategoryId(task.category_id ?? NO_CATEGORY);
     setDueDate(task.due_date);
     setDueTime(task.due_time?.slice(0, 5) ?? "");
@@ -96,7 +94,6 @@ export function TaskDialog({
       title: t,
       description: description.trim() || null,
       priority,
-      is_important: important,
       category_id: categoryId === NO_CATEGORY ? null : categoryId,
       due_date: dueDate,
       due_time: dueTime ? `${dueTime}:00` : null,
@@ -114,8 +111,7 @@ export function TaskDialog({
         title: t,
         description: patch.description,
         priority,
-        is_important: important,
-        category_id: patch.category_id,
+          category_id: patch.category_id,
         due_date: dueDate,
         due_time: patch.due_time,
       });
@@ -298,18 +294,6 @@ export function TaskDialog({
               </div>
             )}
           </div>
-
-          <Button
-            type="button"
-            variant={important ? "default" : "outline"}
-            onClick={() => setImportant((v) => !v)}
-            className="w-full"
-          >
-            <Star
-              className={cn("size-4", important && "fill-current")}
-            />
-            {important ? "Important" : "Mark important"}
-          </Button>
 
           {task && (
             <>

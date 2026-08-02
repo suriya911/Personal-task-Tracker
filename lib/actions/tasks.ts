@@ -10,7 +10,7 @@ import type { CreateTaskInput, UpdateTaskInput } from "@/lib/validations";
 function revalidateAll() {
   revalidatePath("/");
   revalidatePath("/dashboard");
-  revalidatePath("/important");
+  revalidatePath("/collections");
   revalidatePath("/scheduled");
   revalidatePath("/stats");
 }
@@ -40,7 +40,7 @@ export async function createTask(input: CreateTaskInput): Promise<CreateResult> 
   const { supabase, userId } = await requireUser();
   if (!supabase || !userId) return { ok: false, error: "Not signed in" };
 
-  const { title, priority, is_important, category_id, project_id, description } =
+  const { title, priority, category_id, project_id, description } =
     parsed.data;
   // Bare quick-add defaults to "due today"; project quick-add passes null.
   const due_date =
@@ -63,7 +63,6 @@ export async function createTask(input: CreateTaskInput): Promise<CreateResult> 
       title,
       description: description ?? null,
       priority,
-      is_important,
       category_id: finalCategoryId,
       project_id: project_id ?? null,
       due_date,

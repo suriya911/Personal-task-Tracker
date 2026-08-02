@@ -8,7 +8,6 @@ import { TaskItem } from "@/components/tasks/task-item";
 import { TaskListCard } from "@/components/tasks/task-list-card";
 import { ProgressRing } from "@/components/tasks/progress-ring";
 import { TaskDialog } from "@/components/tasks/task-dialog";
-import type { ProjectOption } from "@/components/tasks/add-task-dialog";
 import {
   toggleComplete,
   deleteTask,
@@ -17,12 +16,12 @@ import {
 } from "@/lib/actions/tasks";
 import { taskComparator, nextPostpone } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
-import type { Task, CategoryRow } from "@/types/models";
+import type { Task, GroupRow, ProjectOption } from "@/types/models";
 
 interface TodayViewProps {
   greeting: string;
   today: string; // yyyy-MM-dd
-  categories: CategoryRow[];
+  categories: GroupRow[];
   projects?: ProjectOption[];
   initial: { overdue: Task[]; today: Task[]; noDate: Task[] };
 }
@@ -106,11 +105,11 @@ export function TodayView({
       parent_task_id: null,
       recurrence_id: null,
       is_recurrence_template: false,
+      is_important: false, // column retained, no longer surfaced
       title: draft.title,
       description: null,
       status: "todo",
       priority: draft.priority,
-      is_important: draft.is_important,
       due_date: draft.due_date,
       due_time: null,
       reminder_at: null,

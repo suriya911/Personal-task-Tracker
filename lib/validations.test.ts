@@ -20,10 +20,9 @@ describe("createTaskSchema", () => {
     expect(createTaskSchema.safeParse({ title }).success).toBe(false);
   });
 
-  it("defaults priority to medium and is_important to false", () => {
+  it("defaults priority to medium", () => {
     const parsed = createTaskSchema.parse({ title: "hi" });
     expect(parsed.priority).toBe("medium");
-    expect(parsed.is_important).toBe(false);
   });
 
   it("rejects an invalid priority", () => {

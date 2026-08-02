@@ -15,7 +15,6 @@ const task = (over: Partial<Task>): Task =>
     description: null,
     status: "todo",
     priority: "medium",
-    is_important: false,
     due_date: null,
     due_time: null,
     reminder_at: null,
