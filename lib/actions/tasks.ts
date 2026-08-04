@@ -226,6 +226,53 @@ export async function shiftTaskDue(
   return { ok: true, prev };
 }
 
+/**
+ * Move a task to an explicit date (or clear it). This is the general case that
+ * "postpone to tomorrow" is one shortcut of — an overdue task usually wants to
+ * come to *today*, not slide another day away, and sometimes it wants a date
+ * you pick.
+ *
+ * Rescheduling by hand isn't procrastination, so it leaves `postponed_count`
+ * alone: that counter exists to show a task you keep pushing, and bumping it
+ * here would make the badge lie.
+ */
+export async function rescheduleTask(
+  id: string,
+  dueDate: string | null,
+): Promise<PostponeResult> {
+  if (dueDate !== null && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+    return { ok: false, error: "Invalid date" };
+  }
+
+  const { supabase, userId } = await requireUser();
+  if (!supabase || !userId) return { ok: false, error: "Not signed in" };
+
+  const { data: task, error: readErr } = await supabase
+    .from("tasks")
+    .select("due_date, original_due_date, postponed_count")
+    .eq("id", id)
+    .single();
+
+  if (readErr || !task) {
+    return { ok: false, error: readErr?.message ?? "Task not found" };
+  }
+
+  const prev: Snapshot = {
+    due_date: task.due_date,
+    original_due_date: task.original_due_date,
+    postponed_count: task.postponed_count,
+  };
+
+  const { error } = await supabase
+    .from("tasks")
+    .update({ due_date: dueDate })
+    .eq("id", id);
+
+  if (error) return { ok: false, error: error.message };
+  revalidateAll();
+  return { ok: true, prev };
+}
+
 /** Undo a postpone by restoring the pre-postpone snapshot. */
 export async function restorePostpone(
   id: string,

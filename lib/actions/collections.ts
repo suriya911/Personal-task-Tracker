@@ -18,7 +18,12 @@ const itemSchema = z.object({
   notes: z.string().max(2000).nullable().optional(),
   group_id: z.string().uuid().nullable().optional(),
   tags: z.array(z.string().trim().min(1).max(40)).max(20).default([]),
-  where_to_watch: z.string().trim().max(200).nullable().optional(),
+  source: z.string().trim().max(200).nullable().optional(),
+  due_on: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
   price: z.number().nonnegative().max(9_999_999).nullable().optional(),
   url: z.string().trim().url().max(2000).nullable().optional().or(z.literal("")),
   rating: z.number().int().min(1).max(5).nullable().optional(),

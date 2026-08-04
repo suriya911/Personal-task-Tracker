@@ -6,6 +6,7 @@ import {
   toggleComplete,
   deleteTask,
   shiftTaskDue,
+  rescheduleTask,
   restorePostpone,
 } from "@/lib/actions/tasks";
 import { shiftDue } from "@/lib/tasks";
@@ -93,7 +94,7 @@ export function useTaskCollection(initial: Task[]) {
 
   /** Move the due date a day in either direction. */
   function shift(task: Task, delta: 1 | -1) {
-    // Derive the optimistic date from the same pure helper the server uses —
+    // Derive the optimistic date from the same pure helper the server uses â€”
     // rolling our own here drifted for overdue tasks, which anchor to today.
     const next = shiftDue(
       {
@@ -125,8 +126,23 @@ export function useTaskCollection(initial: Task[]) {
     });
   }
 
-  const onPostpone = (task: Task) => shift(task, 1);
   const onPrepone = (task: Task) => shift(task, -1);
+
+  /** Move to an explicit day. Leaves the postpone counter alone — choosing a
+   *  date deliberately isn't the same as pushing a task away again. */
+  function onReschedule(task: Task, date: string | null) {
+    startTransition(async () => {
+      dispatch({ type: "patch", id: task.id, patch: { due_date: date } });
+      const res = await rescheduleTask(task.id, date);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(date ? "Rescheduled" : "Date cleared", {
+        action: { label: "Undo", onClick: () => undoPostpone(task.id, res.prev) },
+      });
+    });
+  }
 
   return {
     tasks,
@@ -136,7 +152,7 @@ export function useTaskCollection(initial: Task[]) {
     onToggle,
     onDelete,
     onEdit,
-    onPostpone,
+    onReschedule,
     onPrepone,
     onSaved,
     onAdd,

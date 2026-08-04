@@ -11,10 +11,10 @@ import { TaskDialog } from "@/components/tasks/task-dialog";
 import {
   toggleComplete,
   deleteTask,
-  postponeTask,
+  rescheduleTask,
   restorePostpone,
 } from "@/lib/actions/tasks";
-import { taskComparator, nextPostpone } from "@/lib/tasks";
+import { taskComparator } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
 import type { Task, GroupRow, ProjectOption } from "@/types/models";
 
@@ -159,28 +159,16 @@ export function TodayView({
     });
   }
 
-  function handlePostpone(task: Task) {
-    // Same pure helper the server action uses, so the optimistic date matches.
-    const next = nextPostpone(
-      {
-        due_date: task.due_date,
-        original_due_date: task.original_due_date,
-        postponed_count: task.postponed_count,
-      },
-      today,
-    );
+  function handleReschedule(task: Task, date: string | null) {
     startTransition(async () => {
-      dispatch({
-        type: "patch",
-        id: task.id,
-        patch: next,
-      });
-      const res = await postponeTask(task.id);
+      // Rescheduling is an explicit choice, so the postpone counter stays put.
+      dispatch({ type: "patch", id: task.id, patch: { due_date: date } });
+      const res = await rescheduleTask(task.id, date);
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
-      toast.success("Moved to tomorrow", {
+      toast.success(date ? "Rescheduled" : "Date cleared", {
         action: {
           label: "Undo",
           onClick: () => handleUndoPostpone(task.id, res.prev),
@@ -226,7 +214,7 @@ export function TodayView({
                   onToggle={handleToggle}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
-                  onPostpone={handlePostpone}
+                  onReschedule={handleReschedule}
                 />
               </TaskListCard>
             </Collapsible>
@@ -240,7 +228,7 @@ export function TodayView({
                   onToggle={handleToggle}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
-                  onPostpone={handlePostpone}
+                  onReschedule={handleReschedule}
                 />
               </TaskListCard>
             </Section>
@@ -260,7 +248,7 @@ export function TodayView({
                   onToggle={handleToggle}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
-                  onPostpone={handlePostpone}
+                  onReschedule={handleReschedule}
                 />
               </TaskListCard>
             </Collapsible>
@@ -291,14 +279,14 @@ function TaskRows({
   onToggle,
   onDelete,
   onEdit,
-  onPostpone,
+  onReschedule,
 }: {
   tasks: Task[];
   showDueDate?: boolean;
   onToggle: (t: Task, done: boolean) => void;
   onDelete: (t: Task) => void;
   onEdit: (t: Task) => void;
-  onPostpone: (t: Task) => void;
+  onReschedule: (t: Task, date: string | null) => void;
 }) {
   return (
     <div className="space-y-0.5">
@@ -314,7 +302,7 @@ function TaskRows({
             onToggle={onToggle}
             onDelete={onDelete}
             onEdit={onEdit}
-            onPostpone={onPostpone}
+            onReschedule={onReschedule}
           />
         </div>
       ))}

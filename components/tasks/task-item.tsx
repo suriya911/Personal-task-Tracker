@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { canPrepone, priorityBarClass } from "@/lib/tasks";
-import { PostponeButton } from "@/components/tasks/postpone-button";
+import { RescheduleButton } from "@/components/tasks/reschedule-button";
 import type { Task } from "@/types/models";
 
 interface TaskItemProps {
@@ -20,7 +20,8 @@ interface TaskItemProps {
   onToggle: (task: Task, done: boolean) => void;
   onDelete: (task: Task) => void;
   onEdit: (task: Task) => void;
-  onPostpone: (task: Task) => void;
+  /** Reschedule to an explicit date (null clears it). */
+  onReschedule: (task: Task, date: string | null) => void;
   /** Omit to hide the prepone control (Today, where it can never apply). */
   onPrepone?: (task: Task) => void;
   showDueDate?: boolean;
@@ -31,7 +32,7 @@ export function TaskItem({
   onToggle,
   onDelete,
   onEdit,
-  onPostpone,
+  onReschedule,
   onPrepone,
   showDueDate,
 }: TaskItemProps) {
@@ -132,7 +133,12 @@ export function TaskItem({
             </TooltipContent>
           </Tooltip>
         )}
-        {!done && <PostponeButton onPostpone={() => onPostpone(task)} />}
+        {!done && (
+          <RescheduleButton
+            dueDate={task.due_date}
+            onPick={(d) => onReschedule(task, d)}
+          />
+        )}
         <Button
           size="icon"
           variant="ghost"

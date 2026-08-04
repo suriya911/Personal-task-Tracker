@@ -1,6 +1,10 @@
 import { cache } from "react";
 import { createClient, getSessionUser } from "@/lib/supabase/server";
-import type { CollectionItem, CollectionKind } from "@/types/collections";
+import {
+  COLLECTION_KINDS,
+  type CollectionItem,
+  type CollectionKind,
+} from "@/types/collections";
 import { untyped } from "@/lib/supabase/untyped";
 
 const SELECT = "*, group:categories(id, name, color)";
@@ -17,10 +21,12 @@ export const getCollections = cache(async function getCollections(): Promise<{
   byKind: Record<CollectionKind, CollectionItem[]>;
   tags: string[];
 }> {
-  const empty = { game: [], movie: [], wish: [] } as Record<
-    CollectionKind,
-    CollectionItem[]
-  >;
+  // Built from the kind list so adding a kind can never leave a hole here.
+  const blank = () =>
+    Object.fromEntries(
+      COLLECTION_KINDS.map((k) => [k, [] as CollectionItem[]]),
+    ) as unknown as Record<CollectionKind, CollectionItem[]>;
+  const empty = blank();
 
   const supabase = await createClient();
   if (!supabase) return { authed: false, ready: false, byKind: empty, tags: [] };
@@ -43,10 +49,7 @@ export const getCollections = cache(async function getCollections(): Promise<{
   }
 
   const rows = (data ?? []) as unknown as CollectionItem[];
-  const byKind = { game: [], movie: [], wish: [] } as Record<
-    CollectionKind,
-    CollectionItem[]
-  >;
+  const byKind = blank();
   for (const r of rows) byKind[r.kind]?.push(r);
 
   // Every tag in use, for the filter row.

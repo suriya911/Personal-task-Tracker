@@ -1,7 +1,6 @@
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
-import { addDays, format, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { TaskItem } from "@/components/tasks/task-item";
@@ -11,7 +10,7 @@ import {
   createTask,
   toggleComplete,
   deleteTask,
-  postponeTask,
+  rescheduleTask,
   restorePostpone,
 } from "@/lib/actions/tasks";
 import { taskComparator } from "@/lib/tasks";
@@ -142,25 +141,15 @@ export function ProjectView({
     });
   }
 
-  function handlePostpone(task: Task) {
-    const base = task.due_date ? parseISO(task.due_date) : new Date();
-    const nextDue = format(addDays(base, 1), "yyyy-MM-dd");
+  function handleReschedule(task: Task, date: string | null) {
     startTransition(async () => {
-      dispatch({
-        type: "patch",
-        id: task.id,
-        patch: {
-          due_date: nextDue,
-          postponed_count: task.postponed_count + 1,
-          original_due_date: task.original_due_date ?? task.due_date ?? nextDue,
-        },
-      });
-      const res = await postponeTask(task.id);
+      dispatch({ type: "patch", id: task.id, patch: { due_date: date } });
+      const res = await rescheduleTask(task.id, date);
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
-      toast.success("Moved to tomorrow", {
+      toast.success(date ? "Rescheduled" : "Date cleared", {
         action: {
           label: "Undo",
           onClick: () => handleUndoPostpone(task.id, res.prev),
@@ -208,7 +197,7 @@ export function ProjectView({
                 onToggle={handleToggle}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
-                onPostpone={handlePostpone}
+                onReschedule={handleReschedule}
               />
             ))}
           </div>

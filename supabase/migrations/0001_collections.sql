@@ -1,18 +1,34 @@
--- Collections: games, movies, and a wish list.
+-- Collections: things you track rather than things you do.
 --
--- These are task-like but not tasks: a film has no due date, it has a place
--- you can watch it; a wish-list entry has a price. They live in their own
--- table so the tasks table doesn't grow a column per hobby.
+-- A task has a deadline, gets completed, and disappears. A collection item
+-- sits in a state you revisit and browse — a film you'll watch eventually, a
+-- job you've applied for, a book you're part-way through. Keeping them out of
+-- the tasks table is what stops them decaying into overdue guilt.
 --
 -- Run this once in the Supabase SQL editor (or `supabase db push`).
 
-create type collection_kind as enum ('game', 'movie', 'wish');
+create type collection_kind as enum (
+  'game',
+  'movie',
+  'wish',
+  'application',  -- jobs, fellowships, uni programmes
+  'info',         -- things to look up and verify
+  'learning',     -- skills, courses, topics
+  'book'          -- books and papers
+);
 
--- Deliberately generic wording so one set of states covers all three kinds:
---   game  → backlog / playing  / finished
---   movie → backlog / watching / watched
---   wish  → backlog / saved    / bought
-create type collection_status as enum ('backlog', 'active', 'done');
+-- One status set covers every kind; each kind shows only the states that make
+-- sense for it and renames them (backlog reads as "Watchlist" for a film and
+-- "Saved" for an application). The application-only states are what let a job
+-- hunt actually be tracked rather than just listed.
+create type collection_status as enum (
+  'backlog',
+  'active',
+  'done',
+  'interview',
+  'offer',
+  'rejected'
+);
 
 create table if not exists public.collection_items (
   id          uuid primary key default gen_random_uuid(),
@@ -27,12 +43,14 @@ create table if not exists public.collection_items (
   group_id    uuid references public.categories (id) on delete set null,
   tags        text[] not null default '{}',
 
-  -- Kind-specific, all optional: a movie fills `where_to_watch`, a wish-list
-  -- entry fills `price` and `url`, either may carry a rating.
-  where_to_watch text,
-  price          numeric(10, 2),
-  url            text,
-  rating         smallint check (rating between 1 and 5),
+  -- Deliberately generic, relabelled per kind rather than one column per
+  -- hobby: `source` is "where to watch" for a film, the company for an
+  -- application, the author for a book, the platform for a course.
+  source      text,
+  url         text,
+  price       numeric(10, 2),
+  rating      smallint check (rating between 1 and 5),
+  due_on      date,          -- application deadline, return-by date, etc.
 
   position    integer     not null default 0,
   created_at  timestamptz not null default now(),

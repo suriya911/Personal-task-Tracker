@@ -65,7 +65,7 @@ export function ScheduledView({
                       onToggle={c.onToggle}
                       onDelete={c.onDelete}
                       onEdit={c.onEdit}
-                      onPostpone={c.onPostpone}
+                      onReschedule={c.onReschedule}
                       onPrepone={c.onPrepone}
                     />
                   ))}
@@ -105,7 +105,7 @@ export function ScheduledView({
                         onToggle={c.onToggle}
                         onDelete={c.onDelete}
                         onEdit={c.onEdit}
-                        onPostpone={c.onPostpone}
+                        onReschedule={c.onReschedule}
                       />
                     ))}
                   </div>

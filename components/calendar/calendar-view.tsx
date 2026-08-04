@@ -200,7 +200,7 @@ export function CalendarView({
                   onToggle={c.onToggle}
                   onDelete={c.onDelete}
                   onEdit={c.onEdit}
-                  onPostpone={c.onPostpone}
+                  onReschedule={c.onReschedule}
                 />
               ))
             )}
